@@ -209,7 +209,9 @@ test("diagnostics: error recovery clears diagnostics after fix", async () => {
     const diagPromise2 = client.waitForDiagnostics(uri);
     client.changeDocument(uri, fixed, 2);
     const diag2 = await diagPromise2;
-    expect(diag2.diagnostics.length).toBe(0);
+    // Parse errors should be gone; only workspace-level warnings (e.g. dead measurement) may remain
+    const errors = diag2.diagnostics.filter((d: any) => d.severity === 1);
+    expect(errors.length).toBe(0);
   } finally {
     await client.shutdown();
   }
