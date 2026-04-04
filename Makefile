@@ -1,7 +1,8 @@
 .PHONY: lint lint-fix test test-js test-e2e test-all build ci dev-link dev-unlink
 
-# Path to local caffeine_lang checkout (for dev-link)
-CAFFEINE_LANG_PATH ?= ../caffeine_lang
+# Path to local caffeine_lang checkout, relative to caffeine_cli/ and caffeine_lsp/ dirs.
+# Default assumes caffeine_lang repo is a sibling: ../caffeine_lang (from repo root).
+CAFFEINE_LANG_PATH ?= ../../caffeine_lang
 
 # Check code formatting
 lint:
