@@ -1,0 +1,52 @@
+# Gleam build artifacts
+build/
+
+# OS specific
+.DS_Store
+Thumbs.db
+Desktop.ini
+._*
+.Spotlight-V100
+.Trashes
+
+# Editor
+*.swp
+*.swo
+*~
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.history/
+.classpath
+
+# Node.js / Bun
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Build outputs
+/dist/
+/out/
+
+# Terraform
+.terraform
+terraform.tfstate
+main.tf
+variables.tf
+providers.tf
+.terraform.lock.hcl
+
+# Misc
+*.log
+*.tmp
+*.temp
+*.bak
+*.backup
+*.orig
+.cache/
+flame.html

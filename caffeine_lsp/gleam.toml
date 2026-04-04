@@ -1,0 +1,13 @@
+name = "caffeine_lsp"
+version = "0.1.0"
+description = "Language Server Protocol implementation for the Caffeine language."
+licences = ["GPL-3.0"]
+
+target = "javascript"
+
+[dependencies]
+caffeine_lang = ">= 5.0.5 and < 6.0.0"
+gleam_stdlib = ">= 0.70.0 and < 1.0.2"
+
+[dev_dependencies]
+gleeunit = ">= 1.0.2"
