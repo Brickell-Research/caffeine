@@ -2,7 +2,7 @@
 # You typically do not need to edit this file
 
 packages = [
-  { name = "caffeine_lang", version = "5.0.7", build_tools = [
+  { name = "caffeine_lang", version = "5.0.8", build_tools = [
     "gleam",
   ], requirements = [
     "gleam_stdlib",
@@ -25,6 +25,6 @@ packages = [
 ]
 
 [requirements]
-caffeine_lang = { version = ">= 5.0.5 and < 6.0.0" }
+caffeine_lang = { version = ">= 5.0.8 and < 6.0.0" }
 gleam_stdlib = { version = ">= 0.70.0 and < 1.0.2" }
 gleeunit = { version = ">= 1.0.2" }
