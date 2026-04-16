@@ -1,0 +1,24 @@
+package.json
+  h_bf999c3f841c45 3
+caffeine_lsp/gleam.toml
+  h_bf999c3f841c45 9
+Makefile
+  h_bf999c3f841c45 54-55
+caffeine_cli/gleam.toml
+  h_bf999c3f841c45 2,9
+caffeine_cli/manifest.toml
+  h_bf999c3f841c45 9,72
+caffeine_lsp/manifest.toml
+  h_bf999c3f841c45 5,28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.0",
+  "base_commit_sha": "8588bd8b57bef89c79bb3202d28181b0e9710224",
+  "prompts": {},
+  "humans": {
+    "h_bf999c3f841c45": {
+      "author": "robertDurst"
+    }
+  }
+}
