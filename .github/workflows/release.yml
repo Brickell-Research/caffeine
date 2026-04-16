@@ -44,18 +44,6 @@ jobs:
     - name: Install npm dependencies
       run: bun install
 
-    - name: Restore Gleam dependency cache
-      uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
-      with:
-        path: |
-          ~/.cache/gleam
-          caffeine_cli/build
-          caffeine_lsp/build
-        key: ${{ runner.os }}-gleam-release-${{ hashFiles('caffeine_cli/manifest.toml', 'caffeine_lsp/manifest.toml') }}
-        restore-keys: |
-          ${{ runner.os }}-gleam-release-
-          ${{ runner.os }}-gleam-
-
     - name: Build Gleam to JavaScript
       run: |
         cd caffeine_lsp && gleam build --target javascript
