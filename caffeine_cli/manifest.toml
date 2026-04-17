@@ -3,7 +3,7 @@
 
 packages = [
   { name = "argv", version = "1.0.2", build_tools = ["gleam"], requirements = [], otp_app = "argv", source = "hex", outer_checksum = "BA1FF0929525DEBA1CE67256E5ADF77A7CDDFE729E3E3F57A5BDCAA031DED09D" },
-  { name = "caffeine_lang", version = "5.0.8", build_tools = ["gleam"], requirements = ["gleam_stdlib", "terra_madre"], otp_app = "caffeine_lang", source = "hex", outer_checksum = "51AE8A835A3D1247EB4F8ECD07C6DBC8BF2CE3BA55362BDB60C8DDBF59800397" },
+  { name = "caffeine_lang", version = "5.0.10", build_tools = ["gleam"], requirements = ["gleam_stdlib", "terra_madre"], otp_app = "caffeine_lang", source = "hex", outer_checksum = "D24E8325376D3FBAA3766A6EA5C030F600EC2658C571E9DCA1F07652D94B98E1" },
   { name = "envoy", version = "1.1.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "envoy", source = "hex", outer_checksum = "850DA9D29D2E5987735872A2B5C81035146D7FE19EFC486129E44440D03FD832" },
   { name = "filepath", version = "1.1.2", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "filepath", source = "hex", outer_checksum = "B06A9AF0BF10E51401D64B98E4B627F1D2E48C154967DA7AF4D0914780A6D40A" },
   { name = "gleam_community_ansi", version = "1.4.4", build_tools = ["gleam"], requirements = ["gleam_community_colour", "gleam_regexp", "gleam_stdlib"], otp_app = "gleam_community_ansi", source = "hex", outer_checksum = "1B3AEA6074AB34D5F0674744F36DDC7290303A03295507E2DEC61EDD6F5777FE" },
@@ -18,7 +18,7 @@ packages = [
 
 [requirements]
 argv = { version = ">= 1.0.2 and < 2.0.0" }
-caffeine_lang = { version = ">= 5.0.8 and < 6.0.0" }
+caffeine_lang = { version = ">= 5.0.10 and < 6.0.0" }
 envoy = { version = ">= 1.1.0 and < 2.0.0" }
 filepath = { version = ">= 1.1.0 and < 2.0.0" }
 gleam_community_ansi = { version = ">= 1.4.0 and < 2.0.0" }
