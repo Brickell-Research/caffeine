@@ -1,3 +1,4 @@
+import caffeine_cli/color
 import caffeine_cli/display
 import caffeine_lang/linker/artifacts.{ParamInfo}
 import caffeine_lang/types.{TypeMeta}
@@ -5,6 +6,8 @@ import gleam/dict
 import gleam/string
 import gleeunit/should
 import test_helpers
+
+const off = color.ColorDisabled
 
 // ==== pretty_print_slo_params ====
 // * ✅ includes SLO name
@@ -23,7 +26,7 @@ pub fn pretty_print_slo_params_test() {
         ),
       ),
     ])
-  let output = display.pretty_print_slo_params(params)
+  let output = display.pretty_print_slo_params(params, off)
 
   // Verify all expected content is present in the output
   [
@@ -44,7 +47,7 @@ pub fn pretty_print_slo_params_test() {
 // * ✅ output contains category name and description
 pub fn pretty_print_category_test() {
   // Empty types
-  let result = display.pretty_print_category("Test", "Test category", [])
+  let result = display.pretty_print_category("Test", "Test category", [], off)
   { string.contains(result, "Test") } |> should.be_true()
 
   // Single type
@@ -56,7 +59,7 @@ pub fn pretty_print_category_test() {
         syntax: "String",
         example: "\"hello\"",
       ),
-    ])
+    ], off)
   { string.contains(result, "Primitives") } |> should.be_true()
   { string.contains(result, "String") } |> should.be_true()
   { string.contains(result, "Text value") } |> should.be_true()
@@ -76,7 +79,7 @@ pub fn pretty_print_category_test() {
         syntax: "Float",
         example: "3.14",
       ),
-    ])
+    ], off)
   { string.contains(result, "Integer") } |> should.be_true()
   { string.contains(result, "Float") } |> should.be_true()
 }

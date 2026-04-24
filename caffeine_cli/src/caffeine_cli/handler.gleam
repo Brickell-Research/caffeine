@@ -90,7 +90,8 @@ pub fn run_compile(
 
   use target <- result.try(validate_target(target))
   let log_level = log_level_from_quiet(quiet)
-  compile(measurements_dir, expectations_dir, output_path, target, log_level)
+  let mode = color.detect_color_mode()
+  compile(measurements_dir, expectations_dir, output_path, target, log_level, mode)
 }
 
 /// Run the validate command.
@@ -107,7 +108,8 @@ pub fn run_validate(
 
   use target <- result.try(validate_target(target))
   let log_level = log_level_from_quiet(quiet)
-  validate(measurements_dir, expectations_dir, target, log_level)
+  let mode = color.detect_color_mode()
+  validate(measurements_dir, expectations_dir, target, log_level, mode)
 }
 
 /// Run the format command.
@@ -129,13 +131,13 @@ pub fn run_format(
 /// Run the artifacts command.
 @internal
 pub fn run_artifacts(quiet: Bool) -> Result(Nil, String) {
-  artifacts_catalog(log_level_from_quiet(quiet))
+  artifacts_catalog(log_level_from_quiet(quiet), color.detect_color_mode())
 }
 
 /// Run the types command.
 @internal
 pub fn run_types(quiet: Bool) -> Result(Nil, String) {
-  types_catalog(log_level_from_quiet(quiet))
+  types_catalog(log_level_from_quiet(quiet), color.detect_color_mode())
 }
 
 /// Run the lsp command.
@@ -169,12 +171,14 @@ fn compile(
   output_path: Option(String),
   target: String,
   log_level: LogLevel,
+  mode: color.ColorMode,
 ) -> Result(Nil, String) {
   use output <- result.try(load_and_compile(
     measurements_dir,
     expectations_dir,
     target,
     log_level,
+    mode,
   ))
 
   case output_path {
@@ -236,12 +240,14 @@ fn validate(
   expectations_dir: String,
   target: String,
   log_level: LogLevel,
+  mode: color.ColorMode,
 ) -> Result(Nil, String) {
   use _output <- result.try(load_and_compile(
     measurements_dir,
     expectations_dir,
     target,
     log_level,
+    mode,
   ))
 
   compile_presenter.log(log_level, "Validation passed")
@@ -254,17 +260,18 @@ fn load_and_compile(
   expectations_dir: String,
   target: String,
   log_level: LogLevel,
+  mode: color.ColorMode,
 ) -> Result(CompilationOutput, String) {
   // Discover expectation files
   use expectation_paths <- result.try(
     file_discovery.get_caffeine_files(expectations_dir)
-    |> result.map_error(fn(err) { format_compilation_error(err) }),
+    |> result.map_error(fn(err) { format_compilation_error(err, mode) }),
   )
 
   // Discover and read measurement sources
   use measurement_entries <- result.try(
     file_discovery.get_measurement_files(measurements_dir)
-    |> result.map_error(fn(err) { format_compilation_error(err) }),
+    |> result.map_error(fn(err) { format_compilation_error(err, mode) }),
   )
   use measurements <- result.try(
     measurement_entries
@@ -311,8 +318,9 @@ fn load_and_compile(
     expectations,
     target,
     log_level,
+    mode,
   )
-  |> result.map_error(fn(err) { format_compilation_error(err) })
+  |> result.map_error(fn(err) { format_compilation_error(err, mode) })
 }
 
 fn format_command(
@@ -391,20 +399,26 @@ fn write_file(path: String, content: String) -> Result(Nil, String) {
   })
 }
 
-fn artifacts_catalog(log_level: LogLevel) -> Result(Nil, String) {
+fn artifacts_catalog(
+  log_level: LogLevel,
+  mode: color.ColorMode,
+) -> Result(Nil, String) {
   compile_presenter.log(log_level, "Artifact Catalog")
   compile_presenter.log(log_level, string.repeat("=", 16))
   compile_presenter.log(log_level, "")
 
   stdlib_artifacts.slo_params()
-  |> display.pretty_print_slo_params
+  |> display.pretty_print_slo_params(mode)
   |> compile_presenter.log(log_level, _)
 
   compile_presenter.log(log_level, "")
   Ok(Nil)
 }
 
-fn types_catalog(log_level: LogLevel) -> Result(Nil, String) {
+fn types_catalog(
+  log_level: LogLevel,
+  mode: color.ColorMode,
+) -> Result(Nil, String) {
   compile_presenter.log(log_level, "Type System Reference")
   compile_presenter.log(log_level, string.repeat("=", 21))
   compile_presenter.log(log_level, "")
@@ -414,26 +428,31 @@ fn types_catalog(log_level: LogLevel) -> Result(Nil, String) {
       "PrimitiveTypes",
       "Base value types for simple data",
       types.primitive_all_type_metas(),
+      mode,
     ),
     display.pretty_print_category(
       "CollectionTypes",
       "Container types for grouping values",
       types.collection_all_type_metas(),
+      mode,
     ),
     display.pretty_print_category(
       "StructuredTypes",
       "Named fields with typed values",
       types.structured_all_type_metas(),
+      mode,
     ),
     display.pretty_print_category(
       "ModifierTypes",
       "Wrappers that change how values are handled",
       types.modifier_all_type_metas(),
+      mode,
     ),
     display.pretty_print_category(
       "RefinementTypes",
       "Constraints that restrict allowed values",
       types.refinement_all_type_metas(),
+      mode,
     ),
   ]
   |> string.join("\n\n")
@@ -443,8 +462,10 @@ fn types_catalog(log_level: LogLevel) -> Result(Nil, String) {
   Ok(Nil)
 }
 
-fn format_compilation_error(err: errors.CompilationError) -> String {
-  let color_mode = color.detect_color_mode()
+fn format_compilation_error(
+  err: errors.CompilationError,
+  mode: color.ColorMode,
+) -> String {
   let errs = errors.to_list(err)
-  error_presenter.render_all(errs, color_mode)
+  error_presenter.render_all(errs, mode)
 }

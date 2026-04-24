@@ -1,3 +1,4 @@
+import caffeine_cli/color.{type ColorMode}
 import caffeine_lang/compiler.{type CompilationOutput}
 import caffeine_lang/errors
 import caffeine_lang/source_file.{
@@ -6,7 +7,6 @@ import caffeine_lang/source_file.{
 import gleam/io
 import gleam/list
 import gleam/result
-import gleam_community/ansi
 
 /// Defines the verbosity level for CLI output.
 pub type LogLevel {
@@ -20,31 +20,34 @@ pub fn compile_with_output(
   expectations: List(SourceFile(ExpectationSource)),
   target: String,
   log_level: LogLevel,
+  mode: ColorMode,
 ) -> Result(CompilationOutput, errors.CompilationError) {
   log(log_level, "")
   log(
     log_level,
-    ansi.bold(ansi.cyan("=== CAFFEINE COMPILER (" <> target <> ") ===")),
+    color.bold(color.cyan("=== CAFFEINE COMPILER (" <> target <> ") ===", mode), mode),
   )
   log(log_level, "")
 
   use output <- result.try(case compiler.compile(measurements, expectations) {
     Ok(output) -> {
-      log(log_level, "  " <> ansi.green("✓ Compilation succeeded"))
+      log(log_level, "  " <> color.green("✓ Compilation succeeded", mode))
       Ok(output)
     }
     Error(err) -> {
-      log(log_level, "  " <> ansi.red("✗ Compilation failed"))
+      log(log_level, "  " <> color.red("✗ Compilation failed", mode))
       Error(err)
     }
   })
 
   // Print any warnings from the compiler.
   output.warnings
-  |> list.each(fn(warning) { io.println_error("warning: " <> warning) })
+  |> list.each(fn(warning) {
+    io.println_error(color.yellow("warning: ", mode) <> warning)
+  })
 
   log(log_level, "")
-  log(log_level, ansi.bold(ansi.green("=== COMPILATION COMPLETE ===")))
+  log(log_level, color.bold(color.green("=== COMPILATION COMPLETE ===", mode), mode))
   log(log_level, "")
 
   Ok(output)
