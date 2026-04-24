@@ -1,5 +1,6 @@
 import argv
 import caffeine_cli/color
+import caffeine_cli/distance
 import caffeine_cli/handler
 import caffeine_cli/help
 import caffeine_cli/theme
@@ -8,6 +9,7 @@ import gleam/bool
 import gleam/dict.{type Dict}
 import gleam/io
 import gleam/list
+import gleam/option
 import gleam/result
 import gleam/string
 
@@ -173,6 +175,25 @@ fn dispatch(parsed: ParsedArgs) -> Result(Nil, String) {
     "types" -> handler.run_types(quiet)
     "lsp" -> handler.run_lsp()
     "explain" -> handler.run_explain(parsed.positional)
-    _ -> Error("Unknown command: " <> parsed.command)
+    other -> Error(unknown_command_message(other))
   }
+}
+
+/// Known top-level subcommands. Kept in sync with `dispatch/1`'s match
+/// arms; used both for the unknown-command did-you-mean and (by future
+/// PRs) for shell-completion generation.
+const known_commands: List(String) = [
+  "compile", "validate", "format", "artifacts", "types", "explain", "lsp",
+]
+
+/// Build the error message shown when the user types a command Caffeine
+/// doesn't know. Includes a did-you-mean when one of the known commands
+/// is within edit distance 2.
+fn unknown_command_message(command: String) -> String {
+  let suffix = case distance.nearest(command, known_commands, max_distance: 2) {
+    option.Some(near) -> "\n\nDid you mean `" <> near <> "`?"
+    option.None ->
+      "\n\nKnown commands: " <> string.join(known_commands, ", ")
+  }
+  "Unknown command: " <> command <> suffix
 }
