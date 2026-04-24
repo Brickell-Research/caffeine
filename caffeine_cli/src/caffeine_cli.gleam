@@ -1,5 +1,9 @@
 import argv
+import caffeine_cli/color
 import caffeine_cli/handler
+import caffeine_cli/help
+import caffeine_cli/theme
+import caffeine_cli/tty
 import gleam/bool
 import gleam/dict.{type Dict}
 import gleam/io
@@ -60,7 +64,11 @@ pub fn run_with_output(
       || has_flag(parsed.flags, "h")
       || parsed.command == "",
     fn() {
-      output(handler.help_text())
+      let caps = tty.detect(tty.Auto)
+      let mode = color.from_capabilities(caps)
+      let no_theme_flag = get_bool_flag(parsed.flags, "no-theme")
+      let chosen_theme = theme.resolve(no_theme_flag)
+      output(help.render(mode, chosen_theme, caps.unicode))
       Ok(Nil)
     },
   )

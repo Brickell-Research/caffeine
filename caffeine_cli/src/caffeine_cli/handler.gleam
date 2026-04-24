@@ -28,51 +28,6 @@ pub fn version_string() -> String {
   "caffeine " <> constants.version <> " (Brickell Research)"
 }
 
-// --- Help text ---
-
-/// Returns the top-level help text.
-pub fn help_text() -> String {
-  string.join(
-    [
-      "caffeine - A compiler for generating reliability artifacts from service expectation definitions.",
-      "",
-      "Version: " <> constants.version,
-      "",
-      "USAGE:",
-      "  caffeine <command> [flags] [arguments]",
-      "",
-      "COMMANDS:",
-      "  compile <measurements_dir> <expectations_dir> [output_path]",
-      "    Compile .caffeine measurements and expectations to output",
-      "",
-      "  validate <measurements_dir> <expectations_dir>",
-      "    Validate .caffeine measurements and expectations without writing output",
-      "",
-      "  format <path>",
-      "    Format .caffeine files",
-      "",
-      "  artifacts",
-      "    List available artifacts from the standard library",
-      "",
-      "  types",
-      "    Show the type system reference with all supported types",
-      "",
-      "  lsp",
-      "    Start the Language Server Protocol server",
-      "",
-      "FLAGS:",
-      "  --quiet       Suppress compilation progress output",
-      "  --check       Check formatting without modifying files (format only)",
-      "  --target      Code generation target: terraform or opentofu (default: terraform)",
-      "  --no-theme    Use neutral status verbs instead of branded ones",
-      "                (also via CAFFEINE_NO_THEME=1)",
-      "  -v, --version Show version information",
-      "  --help        Show this help message",
-    ],
-    "\n",
-  )
-}
-
 // --- Command functions ---
 
 /// Run the compile command.
