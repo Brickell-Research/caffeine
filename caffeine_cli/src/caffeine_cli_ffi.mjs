@@ -11,3 +11,7 @@ export function is_stdout_tty() {
 export function stdout_columns() {
   return (process.stdout && process.stdout.columns) || 80;
 }
+
+export function now_ms() {
+  return Date.now();
+}

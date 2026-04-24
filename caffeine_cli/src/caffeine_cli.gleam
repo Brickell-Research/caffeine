@@ -152,10 +152,11 @@ fn has_flag(flags: Dict(String, String), key: String) -> Bool {
 fn dispatch(parsed: ParsedArgs) -> Result(Nil, String) {
   let quiet = get_bool_flag(parsed.flags, "quiet")
   let target = get_string_flag(parsed.flags, "target", "terraform")
+  let no_theme = get_bool_flag(parsed.flags, "no-theme")
 
   case parsed.command {
-    "compile" -> handler.run_compile(quiet, target, parsed.positional)
-    "validate" -> handler.run_validate(quiet, target, parsed.positional)
+    "compile" -> handler.run_compile(quiet, target, no_theme, parsed.positional)
+    "validate" -> handler.run_validate(quiet, target, no_theme, parsed.positional)
     "format" -> {
       let check = get_bool_flag(parsed.flags, "check")
       handler.run_format(quiet, check, parsed.positional)

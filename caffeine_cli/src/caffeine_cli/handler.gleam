@@ -1,8 +1,11 @@
 import caffeine_cli/color
-import caffeine_cli/compile_presenter.{type LogLevel}
+import caffeine_cli/compile_presenter.{
+  type LogLevel, type Presentation, Presentation,
+}
 import caffeine_cli/display
 import caffeine_cli/error_presenter
 import caffeine_cli/file_discovery
+import caffeine_cli/theme
 import caffeine_lang/compiler.{type CompilationOutput}
 import caffeine_lang/constants
 import caffeine_lang/errors
@@ -61,6 +64,8 @@ pub fn help_text() -> String {
       "  --quiet       Suppress compilation progress output",
       "  --check       Check formatting without modifying files (format only)",
       "  --target      Code generation target: terraform or opentofu (default: terraform)",
+      "  --no-theme    Use neutral status verbs instead of branded ones",
+      "                (also via CAFFEINE_NO_THEME=1)",
       "  -v, --version Show version information",
       "  --help        Show this help message",
     ],
@@ -75,6 +80,7 @@ pub fn help_text() -> String {
 pub fn run_compile(
   quiet: Bool,
   target: String,
+  no_theme: Bool,
   positional: List(String),
 ) -> Result(Nil, String) {
   use #(measurements_dir, expectations_dir, output_path) <- result.try(
@@ -89,9 +95,8 @@ pub fn run_compile(
   )
 
   use target <- result.try(validate_target(target))
-  let log_level = log_level_from_quiet(quiet)
-  let mode = color.detect_color_mode()
-  compile(measurements_dir, expectations_dir, output_path, target, log_level, mode)
+  let pres = presentation(quiet, no_theme)
+  compile(measurements_dir, expectations_dir, output_path, target, pres)
 }
 
 /// Run the validate command.
@@ -99,6 +104,7 @@ pub fn run_compile(
 pub fn run_validate(
   quiet: Bool,
   target: String,
+  no_theme: Bool,
   positional: List(String),
 ) -> Result(Nil, String) {
   use #(measurements_dir, expectations_dir) <- result.try(case positional {
@@ -107,9 +113,16 @@ pub fn run_validate(
   })
 
   use target <- result.try(validate_target(target))
-  let log_level = log_level_from_quiet(quiet)
-  let mode = color.detect_color_mode()
-  validate(measurements_dir, expectations_dir, target, log_level, mode)
+  let pres = presentation(quiet, no_theme)
+  validate(measurements_dir, expectations_dir, target, pres)
+}
+
+fn presentation(quiet: Bool, no_theme: Bool) -> Presentation {
+  Presentation(
+    log_level: log_level_from_quiet(quiet),
+    color: color.detect_color_mode(),
+    theme: theme.resolve(no_theme),
+  )
 }
 
 /// Run the format command.
@@ -170,16 +183,15 @@ fn compile(
   expectations_dir: String,
   output_path: Option(String),
   target: String,
-  log_level: LogLevel,
-  mode: color.ColorMode,
+  pres: Presentation,
 ) -> Result(Nil, String) {
   use output <- result.try(load_and_compile(
     measurements_dir,
     expectations_dir,
     target,
-    log_level,
-    mode,
+    pres,
   ))
+  let log_level = pres.log_level
 
   case output_path {
     option.None -> {
@@ -239,18 +251,16 @@ fn validate(
   measurements_dir: String,
   expectations_dir: String,
   target: String,
-  log_level: LogLevel,
-  mode: color.ColorMode,
+  pres: Presentation,
 ) -> Result(Nil, String) {
   use _output <- result.try(load_and_compile(
     measurements_dir,
     expectations_dir,
     target,
-    log_level,
-    mode,
+    pres,
   ))
 
-  compile_presenter.log(log_level, "Validation passed")
+  compile_presenter.log(pres.log_level, "Validation passed")
   Ok(Nil)
 }
 
@@ -259,19 +269,18 @@ fn load_and_compile(
   measurements_dir: String,
   expectations_dir: String,
   target: String,
-  log_level: LogLevel,
-  mode: color.ColorMode,
+  pres: Presentation,
 ) -> Result(CompilationOutput, String) {
   // Discover expectation files
   use expectation_paths <- result.try(
     file_discovery.get_caffeine_files(expectations_dir)
-    |> result.map_error(fn(err) { format_compilation_error(err, mode) }),
+    |> result.map_error(fn(err) { format_compilation_error(err, pres.color) }),
   )
 
   // Discover and read measurement sources
   use measurement_entries <- result.try(
     file_discovery.get_measurement_files(measurements_dir)
-    |> result.map_error(fn(err) { format_compilation_error(err, mode) }),
+    |> result.map_error(fn(err) { format_compilation_error(err, pres.color) }),
   )
   use measurements <- result.try(
     measurement_entries
@@ -317,10 +326,9 @@ fn load_and_compile(
     measurements,
     expectations,
     target,
-    log_level,
-    mode,
+    pres,
   )
-  |> result.map_error(fn(err) { format_compilation_error(err, mode) })
+  |> result.map_error(fn(err) { format_compilation_error(err, pres.color) })
 }
 
 fn format_command(
