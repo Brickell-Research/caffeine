@@ -37,6 +37,7 @@ fn commands() -> List(Command) {
     Command("format", "Format .caffeine files"),
     Command("artifacts", "List standard-library artifacts"),
     Command("types", "Show the type-system reference"),
+    Command("explain", "Explain an error code (e.g. caffeine explain E100)"),
     Command("lsp", "Start the language server (used by editors)"),
   ]
 }

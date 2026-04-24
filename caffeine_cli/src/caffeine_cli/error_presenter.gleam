@@ -62,7 +62,22 @@ pub fn render(error: CompilationError, color_mode: ColorMode) -> String {
     option.None -> option.None
   }
 
-  [option.Some(header), location_line, snippet, suggestion_line]
+  let explain_line =
+    option.Some(
+      "   "
+      <> color.cyan("= help:", color_mode)
+      <> " run `"
+      <> color.green("caffeine explain " <> code_str, color_mode)
+      <> "` for more on this error",
+    )
+
+  [
+    option.Some(header),
+    location_line,
+    snippet,
+    suggestion_line,
+    explain_line,
+  ]
   |> list.filter_map(fn(opt) {
     case opt {
       option.Some(val) -> Ok(val)

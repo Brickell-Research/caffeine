@@ -172,6 +172,7 @@ fn dispatch(parsed: ParsedArgs) -> Result(Nil, String) {
     "artifacts" -> handler.run_artifacts(quiet)
     "types" -> handler.run_types(quiet)
     "lsp" -> handler.run_lsp()
+    "explain" -> handler.run_explain(parsed.positional)
     _ -> Error("Unknown command: " <> parsed.command)
   }
 }

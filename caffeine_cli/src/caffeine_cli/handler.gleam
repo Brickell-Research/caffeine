@@ -4,6 +4,7 @@ import caffeine_cli/compile_presenter.{
 }
 import caffeine_cli/display
 import caffeine_cli/error_presenter
+import caffeine_cli/explanations
 import caffeine_cli/file_discovery
 import caffeine_cli/theme
 import caffeine_lang/compiler.{type CompilationOutput}
@@ -114,6 +115,111 @@ pub fn run_lsp() -> Result(Nil, String) {
   Error(
     "LSP mode requires the compiled binary (main.mjs intercepts this argument)",
   )
+}
+
+/// Run the explain command: look up prose for an error code and render it.
+@internal
+pub fn run_explain(positional: List(String)) -> Result(Nil, String) {
+  use raw_code <- result.try(case positional {
+    [code, ..] -> Ok(code)
+    [] -> Error(explain_usage_message())
+  })
+  let mode = color.detect_color_mode()
+  case explanations.lookup(raw_code) {
+    Ok(explanation) -> {
+      compile_presenter.log(
+        compile_presenter.Verbose,
+        explanations.render(explanation, mode),
+      )
+      Ok(Nil)
+    }
+    Error(_) -> Error(unknown_code_message(raw_code, mode))
+  }
+}
+
+fn explain_usage_message() -> String {
+  "Usage: caffeine explain <CODE>\n\n"
+  <> "Examples:\n"
+  <> "  caffeine explain E100\n"
+  <> "  caffeine explain e303"
+}
+
+fn unknown_code_message(code: String, mode: color.ColorMode) -> String {
+  let upper = string.uppercase(code)
+  let prefix =
+    color.bold(color.red("error", mode), mode)
+    <> ": no explanation registered for `"
+    <> upper
+    <> "`"
+  let suggestion = case suggest_code(upper) {
+    option.Some(near) ->
+      "\n\n  "
+      <> color.bold(color.cyan("help", mode), mode)
+      <> ": did you mean "
+      <> color.green(near, mode)
+      <> "?"
+    option.None ->
+      "\n\n  "
+      <> color.dim(
+        "known codes: " <> string.join(explanations.known_codes(), ", "),
+        mode,
+      )
+  }
+  prefix <> suggestion
+}
+
+/// Best-effort did-you-mean against known codes. Returns the closest
+/// match when edit distance is small enough to be plausibly a typo.
+fn suggest_code(code: String) -> option.Option(String) {
+  let candidates = explanations.known_codes()
+  list.fold(candidates, option.None, fn(best, candidate) {
+    let distance = levenshtein(code, candidate)
+    case best {
+      option.None ->
+        case distance <= 2 {
+          True -> option.Some(candidate)
+          False -> option.None
+        }
+      option.Some(current) -> {
+        let current_distance = levenshtein(code, current)
+        case distance < current_distance {
+          True -> option.Some(candidate)
+          False -> option.Some(current)
+        }
+      }
+    }
+  })
+}
+
+/// Small Levenshtein-distance implementation. Sufficient for codes that
+/// are never longer than ~6 characters; don't call this in hot loops.
+fn levenshtein(a: String, b: String) -> Int {
+  let ag = string.to_graphemes(a)
+  let bg = string.to_graphemes(b)
+  levenshtein_rec(ag, bg)
+}
+
+fn levenshtein_rec(a: List(String), b: List(String)) -> Int {
+  case a, b {
+    [], rest -> list.length(rest)
+    rest, [] -> list.length(rest)
+    [x, ..xs], [y, ..ys] if x == y -> levenshtein_rec(xs, ys)
+    [_, ..xs] as a2, [_, ..ys] as b2 -> {
+      let delete = levenshtein_rec(xs, b2)
+      let insert = levenshtein_rec(a2, ys)
+      let substitute = levenshtein_rec(xs, ys)
+      1 + min3(delete, insert, substitute)
+    }
+  }
+}
+
+fn min3(a: Int, b: Int, c: Int) -> Int {
+  case a < b, a < c, b < c {
+    True, True, _ -> a
+    True, False, _ -> c
+    False, _, True -> b
+    False, _, False -> c
+  }
 }
 
 // --- Private functions ---
