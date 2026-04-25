@@ -4,9 +4,9 @@ import gleeunit/should
 
 // Env vars touched in these tests; reset before and after each case.
 const env_vars = [
-  "NO_COLOR", "FORCE_COLOR", "CLICOLOR", "CLICOLOR_FORCE",
-  "CAFFEINE_COLOR", "TERM", "CI", "GITHUB_ACTIONS", "GITLAB_CI",
-  "BUILDKITE", "CIRCLECI", "JENKINS_URL", "TF_BUILD",
+  "NO_COLOR", "FORCE_COLOR", "CLICOLOR", "CLICOLOR_FORCE", "CAFFEINE_COLOR",
+  "TERM", "CI", "GITHUB_ACTIONS", "GITLAB_CI", "BUILDKITE", "CIRCLECI",
+  "JENKINS_URL", "TF_BUILD",
 ]
 
 fn clean() -> Nil {

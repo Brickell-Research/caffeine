@@ -7,6 +7,7 @@ import gleam/string
 import gleeunit/should
 
 const off = color.ColorDisabled
+
 const on = color.ColorEnabled
 
 // --- Themed: structure ---
@@ -156,7 +157,9 @@ fn all_present(items: List(String), text: String) -> Nil {
       case string.contains(text, item) {
         True -> all_present(rest, text)
         False ->
-          panic as { "expected '" <> item <> "' in help output, but it was missing" }
+          panic as {
+            "expected '" <> item <> "' in help output, but it was missing"
+          }
       }
     }
   }

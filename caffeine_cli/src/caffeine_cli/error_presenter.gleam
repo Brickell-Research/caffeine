@@ -67,8 +67,10 @@ pub fn render(
     _, None -> None
   }
 
-  let help_lines = list.map(diagnostic.helps, fn(h) { format_help(h, color_mode) })
-  let note_lines = list.map(diagnostic.notes, fn(n) { format_note(n, color_mode) })
+  let help_lines =
+    list.map(diagnostic.helps, fn(h) { format_help(h, color_mode) })
+  let note_lines =
+    list.map(diagnostic.notes, fn(n) { format_note(n, color_mode) })
   let explain_line = format_explain(code_str, color_mode)
 
   let parts =
@@ -170,6 +172,7 @@ fn glyphs_for(unicode: Bool) -> SnippetGlyphs {
 // --- Snippet block ---
 
 const context_above: Int = 2
+
 const context_below: Int = 1
 
 fn format_snippet_block(
@@ -201,22 +204,13 @@ fn format_snippet_block(
         True ->
           formatted
           <> "\n"
-          <> format_underline(
-            span,
-            empty_gutter,
-            severity,
-            glyphs,
-            color_mode,
-          )
+          <> format_underline(span, empty_gutter, severity, glyphs, color_mode)
         False -> formatted
       }
     })
 
   let opening_pipe =
-    "  "
-    <> empty_gutter
-    <> " "
-    <> color.dim(glyphs.vertical, color_mode)
+    "  " <> empty_gutter <> " " <> color.dim(glyphs.vertical, color_mode)
   let closing_pipe =
     "  "
     <> empty_gutter
@@ -257,8 +251,7 @@ fn format_coords(span: Span) -> String {
   }
   case span.start.line, span.start.column {
     0, 0 -> path
-    line, col ->
-      path <> ":" <> int.to_string(line) <> ":" <> int.to_string(col)
+    line, col -> path <> ":" <> int.to_string(line) <> ":" <> int.to_string(col)
   }
 }
 
@@ -303,7 +296,10 @@ fn format_underline(
   <> color.dim(glyphs.vertical, color_mode)
   <> " "
   <> column_pad
-  <> color.bold(severity_color(severity, underline <> label, color_mode), color_mode)
+  <> color.bold(
+    severity_color(severity, underline <> label, color_mode),
+    color_mode,
+  )
 }
 
 /// Extract `(line_number, line_content)` pairs around `center_line`,

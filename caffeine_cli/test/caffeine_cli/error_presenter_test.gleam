@@ -116,11 +116,7 @@ pub fn render_always_includes_explain_footer_test() {
 // --- No-snippet path: when source is missing, no box, but footer still there ---
 
 pub fn render_without_source_skips_snippet_test() {
-  let d =
-    diagnostic.Diagnostic(
-      ..sample_diagnostic(),
-      source: None,
-    )
+  let d = diagnostic.Diagnostic(..sample_diagnostic(), source: None)
   let out = error_presenter.render(d, off, True)
   // Box header still appears (we know the file/line) but no body or footer.
   string.contains(out, "╭─[") |> should.be_true
@@ -141,10 +137,7 @@ pub fn render_color_off_has_no_escapes_test() {
 
 pub fn render_warning_uses_warning_word_test() {
   let d =
-    diagnostic.Diagnostic(
-      ..sample_diagnostic(),
-      severity: diagnostic.Warning,
-    )
+    diagnostic.Diagnostic(..sample_diagnostic(), severity: diagnostic.Warning)
   let out = error_presenter.render(d, off, True)
   string.contains(out, "warning[E100]") |> should.be_true
   string.contains(out, "error[E100]") |> should.be_false

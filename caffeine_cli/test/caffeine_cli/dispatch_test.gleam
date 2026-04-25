@@ -4,7 +4,6 @@ import gleeunit/should
 
 /// Use the public `run/1` entry point — it never touches stdout when it
 /// returns an Error, so we can assert on the message directly.
-
 pub fn unknown_command_close_typo_suggests_test() {
   let assert Error(msg) = caffeine_cli.run(["compil"])
   string.contains(msg, "Unknown command: compil") |> should.be_true

@@ -33,7 +33,10 @@ fn flags() -> List(Flag) {
     Flag("--quiet", "Suppress compilation progress output"),
     Flag("--check", "Check formatting without modifying files (format only)"),
     Flag("--target=<terraform|opentofu>", "Codegen target (default: terraform)"),
-    Flag("--no-theme", "Use neutral status verbs (also via CAFFEINE_NO_THEME=1)"),
+    Flag(
+      "--no-theme",
+      "Use neutral status verbs (also via CAFFEINE_NO_THEME=1)",
+    ),
     Flag("-v, --version", "Show version information"),
     Flag("--help", "Show this help message"),
   ]
@@ -60,21 +63,27 @@ fn render_themed(color_mode: ColorMode, unicode: Bool) -> String {
     color.bold(color.cyan("Usage:", color_mode), color_mode)
     <> "  caffeine <command> [flags] [arguments]"
 
-  let cmd_box = render_box("commands", commands_to_lines(color_mode), unicode, color_mode)
+  let cmd_box =
+    render_box("commands", commands_to_lines(color_mode), unicode, color_mode)
 
   let flag_lines =
     flags()
     |> list.map(format_flag_line(_, color_mode))
     |> string.join("\n")
   let flags_section =
-    color.bold(color.cyan("Flags:", color_mode), color_mode) <> "\n" <> flag_lines
+    color.bold(color.cyan("Flags:", color_mode), color_mode)
+    <> "\n"
+    <> flag_lines
 
   let docs =
     color.bold(color.cyan("Docs:", color_mode), color_mode)
     <> "   "
     <> color.dim(docs_url, color_mode)
 
-  string.join([banner, "", usage, "", cmd_box, "", flags_section, "", docs], "\n")
+  string.join(
+    [banner, "", usage, "", cmd_box, "", flags_section, "", docs],
+    "\n",
+  )
 }
 
 fn commands_to_lines(color_mode: ColorMode) -> List(String) {
@@ -289,7 +298,10 @@ pub fn render_command(spec: CommandSpec, color_mode: ColorMode) -> String {
 
 /// Format one flag row for per-command help (slightly tighter than the
 /// global FLAGS section: 28-col gutter rather than 30).
-fn format_per_command_flag(flag: args.FlagSpec, color_mode: ColorMode) -> String {
+fn format_per_command_flag(
+  flag: args.FlagSpec,
+  color_mode: ColorMode,
+) -> String {
   let pad = case 28 - string.length(flag.name) {
     n if n > 0 -> string.repeat(" ", n)
     _ -> "  "

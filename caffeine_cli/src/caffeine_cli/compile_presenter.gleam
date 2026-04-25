@@ -69,10 +69,7 @@ pub fn compile_with_output(
           verb_success(pres.theme),
           pres.color,
           pres.theme,
-          color.green(
-            "✓ in " <> clock.format_elapsed(elapsed),
-            pres.color,
-          ),
+          color.green("✓ in " <> clock.format_elapsed(elapsed), pres.color),
         ),
       )
       output.warnings
@@ -89,10 +86,7 @@ pub fn compile_with_output(
           verb_failure(pres.theme),
           pres.color,
           pres.theme,
-          color.red(
-            "✗ in " <> clock.format_elapsed(elapsed),
-            pres.color,
-          ),
+          color.red("✗ in " <> clock.format_elapsed(elapsed), pres.color),
         ),
       )
       Error(err)
@@ -158,7 +152,11 @@ fn status_line(
 /// compiler had silently dropped the new one (caffeine_lang#74).
 /// Surfacing real definition counts requires richer data from
 /// CompilationOutput; that's a separate cross-repo change.
-fn summarize_inputs(measurements: Int, expectations: Int, target: String) -> String {
+fn summarize_inputs(
+  measurements: Int,
+  expectations: Int,
+  target: String,
+) -> String {
   pluralize(measurements, "measurement file", "measurement files")
   <> ", "
   <> pluralize(expectations, "expectation file", "expectation files")

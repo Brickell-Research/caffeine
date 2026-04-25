@@ -31,8 +31,7 @@ pub fn every_known_error_code_has_explanation_test() {
     let code = errors.error_code_to_string(errors.error_code_for(err))
     case explanations.lookup(code) {
       Ok(_) -> Nil
-      Error(_) ->
-        panic as { "no explanation registered for " <> code }
+      Error(_) -> panic as { "no explanation registered for " <> code }
     }
   })
 }

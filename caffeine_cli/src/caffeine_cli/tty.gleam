@@ -137,8 +137,8 @@ fn locale_is_utf8() -> Bool {
 
 fn is_ci() -> Bool {
   [
-    "CI", "GITHUB_ACTIONS", "GITLAB_CI", "BUILDKITE", "CIRCLECI",
-    "JENKINS_URL", "TF_BUILD",
+    "CI", "GITHUB_ACTIONS", "GITLAB_CI", "BUILDKITE", "CIRCLECI", "JENKINS_URL",
+    "TF_BUILD",
   ]
   |> list.any(env_truthy)
 }

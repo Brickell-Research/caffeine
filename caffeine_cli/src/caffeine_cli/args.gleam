@@ -41,11 +41,13 @@ pub fn commands() -> List(CommandSpec) {
       name: "compile",
       summary: "Compile measurements + expectations to a target",
       signature: "<measurements_dir> <expectations_dir> [output_path]",
-      description:
-        "Compile .caffeine measurements and expectations into the configured "
+      description: "Compile .caffeine measurements and expectations into the configured "
         <> "code-generation target (Terraform by default, OpenTofu via --target).",
       flags: [
-        FlagSpec("--target=<terraform|opentofu>", "Codegen target (default: terraform)"),
+        FlagSpec(
+          "--target=<terraform|opentofu>",
+          "Codegen target (default: terraform)",
+        ),
         FlagSpec("--quiet", "Suppress compilation progress output"),
       ],
       examples: [
@@ -58,12 +60,14 @@ pub fn commands() -> List(CommandSpec) {
       name: "validate",
       summary: "Type-check without writing output",
       signature: "<measurements_dir> <expectations_dir>",
-      description:
-        "Run the same parse/link/analyze pipeline as `compile`, but skip "
+      description: "Run the same parse/link/analyze pipeline as `compile`, but skip "
         <> "code generation and produce no files. Useful in CI to gate merges "
         <> "without touching the build artifacts.",
       flags: [
-        FlagSpec("--target=<terraform|opentofu>", "Codegen target (default: terraform)"),
+        FlagSpec(
+          "--target=<terraform|opentofu>",
+          "Codegen target (default: terraform)",
+        ),
         FlagSpec("--quiet", "Suppress compilation progress output"),
       ],
       examples: ["caffeine validate measurements/ expectations/"],
@@ -72,8 +76,7 @@ pub fn commands() -> List(CommandSpec) {
       name: "format",
       summary: "Format .caffeine files",
       signature: "<path>",
-      description:
-        "Format one or more .caffeine files in place. With --check, exits "
+      description: "Format one or more .caffeine files in place. With --check, exits "
         <> "non-zero if any file would change instead of modifying anything.",
       flags: [
         FlagSpec("--check", "Check formatting without modifying files"),
@@ -88,8 +91,7 @@ pub fn commands() -> List(CommandSpec) {
       name: "artifacts",
       summary: "List standard-library artifacts",
       signature: "",
-      description:
-        "Print the catalog of artifacts (e.g. SLO) provided by Caffeine's "
+      description: "Print the catalog of artifacts (e.g. SLO) provided by Caffeine's "
         <> "standard library, including each artifact's parameters and types.",
       flags: [FlagSpec("--quiet", "Suppress decorative output")],
       examples: ["caffeine artifacts"],
@@ -98,8 +100,7 @@ pub fn commands() -> List(CommandSpec) {
       name: "types",
       summary: "Show the type-system reference",
       signature: "",
-      description:
-        "Print every type Caffeine accepts, grouped by category "
+      description: "Print every type Caffeine accepts, grouped by category "
         <> "(primitives, collections, structured, modifiers, refinements). "
         <> "Useful as a quick reference while writing measurement schemas.",
       flags: [FlagSpec("--quiet", "Suppress decorative output")],
@@ -109,8 +110,7 @@ pub fn commands() -> List(CommandSpec) {
       name: "explain",
       summary: "Explain an error code (e.g. caffeine explain E100)",
       signature: "<CODE>",
-      description:
-        "Look up a Caffeine error code (E100, E303, ...) and print its "
+      description: "Look up a Caffeine error code (E100, E303, ...) and print its "
         <> "long-form description, common causes, and how to fix it. Codes "
         <> "are matched case-insensitively.",
       flags: [],
@@ -120,8 +120,7 @@ pub fn commands() -> List(CommandSpec) {
       name: "lsp",
       summary: "Start the language server (used by editors)",
       signature: "",
-      description:
-        "Start the Caffeine Language Server, speaking LSP over stdio. "
+      description: "Start the Caffeine Language Server, speaking LSP over stdio. "
         <> "Editors and IDEs invoke this — you usually don't run it directly.",
       flags: [],
       examples: ["caffeine lsp"],
