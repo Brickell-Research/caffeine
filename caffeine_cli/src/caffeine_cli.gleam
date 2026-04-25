@@ -6,6 +6,7 @@ import caffeine_cli/handler
 import caffeine_cli/help
 import caffeine_cli/theme
 import caffeine_cli/tty
+import caffeine_cli/update_check
 import gleam/bool
 import gleam/dict.{type Dict}
 import gleam/io
@@ -33,7 +34,16 @@ pub fn parse_args(args: List(String)) -> ParsedArgs {
 pub fn main() {
   let args = argv.load().arguments
   case run(args) {
-    Ok(Nil) -> Nil
+    Ok(Nil) -> {
+      // After the work the user asked for is done, optionally print a
+      // "new version available" notice. Suppression rules in
+      // `update_check.maybe_notify` keep this silent in CI, when piped,
+      // and on the long-running `lsp` command. Hooked here (not in
+      // `run_with_output`) so tests never trigger a network round-trip.
+      let parsed = parse_args(args)
+      update_check.maybe_notify(parsed.command)
+      Nil
+    }
     Error(msg) -> {
       io.println(msg)
       halt(1)
