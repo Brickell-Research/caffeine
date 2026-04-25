@@ -151,10 +151,17 @@ fn status_line(
   pad <> styled <> "  " <> message
 }
 
+/// Counts here are *files*, not the definitions inside them — a single
+/// .caffeine file can hold many measurements or expectations. The "file"
+/// suffix is load-bearing: showing "1 measurement" when the user just
+/// added a third expectation to an existing file made it look like the
+/// compiler had silently dropped the new one (caffeine_lang#74).
+/// Surfacing real definition counts requires richer data from
+/// CompilationOutput; that's a separate cross-repo change.
 fn summarize_inputs(measurements: Int, expectations: Int, target: String) -> String {
-  pluralize(measurements, "measurement", "measurements")
+  pluralize(measurements, "measurement file", "measurement files")
   <> ", "
-  <> pluralize(expectations, "expectation", "expectations")
+  <> pluralize(expectations, "expectation file", "expectation files")
   <> "  ["
   <> target
   <> "]"
