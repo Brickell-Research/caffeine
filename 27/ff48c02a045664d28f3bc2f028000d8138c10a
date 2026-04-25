@@ -1,0 +1,16 @@
+.github/workflows/release.yml
+  h_bf999c3f841c45 6,10,31,35-38,43,46,51,58,72,79,81,85,89,93,97,101,103,109,120,133,144,158,172,181,184,191,193,195-196,198-199,201-202,204-205,208-217,220
+.github/workflows/test.yml
+  h_bf999c3f841c45 26-28,49-51,56,73,77-80,85,88
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "27ff48c02a045664d28f3bc2f028000d8138c10a",
+  "prompts": {},
+  "humans": {
+    "h_bf999c3f841c45": {
+      "author": "robertDurst"
+    }
+  }
+}
