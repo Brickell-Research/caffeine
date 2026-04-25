@@ -9,6 +9,7 @@ import caffeine_cli/error_presenter
 import caffeine_cli/explanations
 import caffeine_cli/file_discovery
 import caffeine_cli/theme
+import caffeine_cli/tty
 import caffeine_lang/compiler.{type CompilationOutput}
 import caffeine_lang/constants
 import caffeine_lang/errors
@@ -73,10 +74,12 @@ pub fn run_validate(
 }
 
 fn presentation(quiet: Bool, no_theme: Bool) -> Presentation {
+  let caps = tty.detect(tty.Auto)
   Presentation(
     log_level: log_level_from_quiet(quiet),
-    color: color.detect_color_mode(),
+    color: color.from_capabilities(caps),
     theme: theme.resolve(no_theme),
+    unicode: caps.unicode,
   )
 }
 
@@ -285,13 +288,13 @@ fn load_and_compile(
   // Discover expectation files
   use expectation_paths <- result.try(
     file_discovery.get_caffeine_files(expectations_dir)
-    |> result.map_error(fn(err) { format_compilation_error(err, pres.color) }),
+    |> result.map_error(fn(err) { format_compilation_error(err, pres) }),
   )
 
   // Discover and read measurement sources
   use measurement_entries <- result.try(
     file_discovery.get_measurement_files(measurements_dir)
-    |> result.map_error(fn(err) { format_compilation_error(err, pres.color) }),
+    |> result.map_error(fn(err) { format_compilation_error(err, pres) }),
   )
   use measurements <- result.try(
     measurement_entries
@@ -339,7 +342,7 @@ fn load_and_compile(
     target,
     pres,
   )
-  |> result.map_error(fn(err) { format_compilation_error(err, pres.color) })
+  |> result.map_error(fn(err) { format_compilation_error(err, pres) })
 }
 
 fn format_command(
@@ -483,8 +486,8 @@ fn types_catalog(
 
 fn format_compilation_error(
   err: errors.CompilationError,
-  mode: color.ColorMode,
+  pres: Presentation,
 ) -> String {
   let errs = errors.to_list(err)
-  error_presenter.render_all(errs, mode)
+  error_presenter.render_all(errs, pres.color, pres.unicode)
 }

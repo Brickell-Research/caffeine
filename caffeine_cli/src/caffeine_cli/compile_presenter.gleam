@@ -26,8 +26,17 @@ pub type Theme {
 }
 
 /// Presentation policy: how the run should render itself.
+///
+/// `unicode` gates box-drawing glyphs (snippet frame, themed status).
+/// Detection lives in `tty.detect/1`; this record bundles the result
+/// so a single run only pays for capability detection once.
 pub type Presentation {
-  Presentation(log_level: LogLevel, color: ColorMode, theme: Theme)
+  Presentation(
+    log_level: LogLevel,
+    color: ColorMode,
+    theme: Theme,
+    unicode: Bool,
+  )
 }
 
 /// Compiles with progress output around the pure compiler call.
