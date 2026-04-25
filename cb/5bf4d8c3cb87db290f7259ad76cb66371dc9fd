@@ -1,0 +1,35 @@
+caffeine_cli/src/caffeine_cli/args.gleam
+  0816a18c5c57e421 1-169
+caffeine_cli/test/caffeine_cli/help_test.gleam
+  0816a18c5c57e421 1,5,97-149
+caffeine_cli/test/caffeine_cli/args_test.gleam
+  0816a18c5c57e421 1-97
+caffeine_cli/test/caffeine_cli/dispatch_test.gleam
+  0816a18c5c57e421 29-59
+caffeine_cli/src/caffeine_cli/help.gleam
+  0816a18c5c57e421 1,9-11,20,81,89,108,115,226-311
+caffeine_cli/src/caffeine_cli/handler.gleam
+  0816a18c5c57e421 1,48,67,92,140-141
+caffeine_cli/src/caffeine_cli.gleam
+  0816a18c5c57e421 2,13,65-66,69-74,76-79,81-115,221-223,225-228
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "cb5bf4d8c3cb87db290f7259ad76cb66371dc9fd",
+  "prompts": {
+    "0816a18c5c57e421": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23f7efaa-7911-43a2-ade4-812286f33ece",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "robertDurst",
+      "messages": [],
+      "total_additions": 542,
+      "total_deletions": 1287,
+      "accepted_lines": 511,
+      "overriden_lines": 0
+    }
+  }
+}
