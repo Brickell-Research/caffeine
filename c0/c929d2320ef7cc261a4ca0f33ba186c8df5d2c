@@ -1,0 +1,23 @@
+caffeine_cli/src/caffeine_cli/compile_presenter.gleam
+  0816a18c5c57e421 154-160,162,164
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "c0c929d2320ef7cc261a4ca0f33ba186c8df5d2c",
+  "prompts": {
+    "0816a18c5c57e421": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23f7efaa-7911-43a2-ade4-812286f33ece",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "robertDurst",
+      "messages": [],
+      "total_additions": 9,
+      "total_deletions": 178,
+      "accepted_lines": 9,
+      "overriden_lines": 0
+    }
+  }
+}
