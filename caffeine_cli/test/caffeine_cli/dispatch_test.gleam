@@ -26,3 +26,35 @@ pub fn unknown_command_picks_closest_neighbor_test() {
   let assert Error(msg) = caffeine_cli.run(["expalin"])
   string.contains(msg, "Did you mean `explain`?") |> should.be_true
 }
+
+pub fn unknown_command_suggests_help_for_typos_test() {
+  // `help` is a meta-command and isn't in args.command_names(), but the
+  // dispatcher still includes it in did-you-mean candidates.
+  let assert Error(msg) = caffeine_cli.run(["hlep"])
+  string.contains(msg, "Did you mean `help`?") |> should.be_true
+}
+
+// --- Per-command help routes ---
+
+fn discard(_: String) -> Nil {
+  Nil
+}
+
+pub fn help_with_known_subcommand_dispatches_test() {
+  // `caffeine help compile` should succeed (it prints per-command help
+  // via the captured output handler, then returns Ok).
+  caffeine_cli.run_with_output(["help", "compile"], discard)
+  |> should.equal(Ok(Nil))
+}
+
+pub fn help_with_no_arg_dispatches_test() {
+  caffeine_cli.run_with_output(["help"], discard)
+  |> should.equal(Ok(Nil))
+}
+
+pub fn subcommand_help_flag_dispatches_test() {
+  // `caffeine compile --help` should also succeed without trying to
+  // actually compile (which would fail on missing positional args).
+  caffeine_cli.run_with_output(["compile", "--help"], discard)
+  |> should.equal(Ok(Nil))
+}

@@ -1,4 +1,4 @@
-/// Renderer for `caffeine --help`.
+/// Renderer for `caffeine --help` and `caffeine help <command>`.
 ///
 /// Two presentations:
 ///   - Themed (default): tagline + box-drawn commands list + amber verbs.
@@ -6,6 +6,9 @@
 ///
 /// Both degrade gracefully when the terminal is not Unicode-capable
 /// (box switches to ASCII `+ - |`) and when color is off (no escapes).
+///
+/// Command definitions live in `args.gleam`; this module only renders.
+import caffeine_cli/args.{type CommandSpec}
 import caffeine_cli/color.{type ColorMode}
 import caffeine_cli/compile_presenter.{type Theme, Plain, Themed}
 import caffeine_lang/constants
@@ -14,12 +17,7 @@ import gleam/list
 import gleam/regexp
 import gleam/string
 
-/// One row in the COMMANDS section.
-type Command {
-  Command(name: String, description: String)
-}
-
-/// One row in the FLAGS section.
+/// One row in the global FLAGS section.
 type Flag {
   Flag(name: String, description: String)
 }
@@ -29,18 +27,6 @@ const tagline: String = "reliability artifacts, freshly compiled."
 const docs_url: String = "https://caffeine.brickellresearch.org"
 
 const box_inner_width: Int = 72
-
-fn commands() -> List(Command) {
-  [
-    Command("compile", "Compile measurements + expectations to a target"),
-    Command("validate", "Type-check without writing output"),
-    Command("format", "Format .caffeine files"),
-    Command("artifacts", "List standard-library artifacts"),
-    Command("types", "Show the type-system reference"),
-    Command("explain", "Explain an error code (e.g. caffeine explain E100)"),
-    Command("lsp", "Start the language server (used by editors)"),
-  ]
-}
 
 fn flags() -> List(Flag) {
   [
@@ -92,7 +78,7 @@ fn render_themed(color_mode: ColorMode, unicode: Bool) -> String {
 }
 
 fn commands_to_lines(color_mode: ColorMode) -> List(String) {
-  let cmds = commands()
+  let cmds = args.commands()
   let name_width =
     list.fold(cmds, 0, fn(acc, c) { int.max(acc, string.length(c.name)) })
   list.map(cmds, fn(c) {
@@ -100,7 +86,7 @@ fn commands_to_lines(color_mode: ColorMode) -> List(String) {
     color.bold(color.amber(c.name, color_mode), color_mode)
     <> pad
     <> "  "
-    <> color.dim(c.description, color_mode)
+    <> color.dim(c.summary, color_mode)
   })
 }
 
@@ -119,14 +105,14 @@ fn format_flag_line(flag: Flag, color_mode: ColorMode) -> String {
 
 fn render_plain(color_mode: ColorMode) -> String {
   // Mirrors the pre-themed help so users who opt out get the familiar shape.
-  let cmds = commands()
+  let cmds = args.commands()
   let cmd_name_width =
     list.fold(cmds, 0, fn(acc, c) { int.max(acc, string.length(c.name)) })
   let cmd_lines =
     cmds
     |> list.map(fn(c) {
       let pad = string.repeat(" ", cmd_name_width - string.length(c.name))
-      "  " <> color.bold(c.name, color_mode) <> pad <> "  " <> c.description
+      "  " <> color.bold(c.name, color_mode) <> pad <> "  " <> c.summary
     })
     |> string.join("\n")
 
@@ -234,6 +220,92 @@ fn visible_length(s: String) -> Int {
 fn strip_ansi(s: String) -> String {
   case regexp.from_string("\u{001b}\\[[0-9;]*[a-zA-Z]") {
     Ok(re) -> regexp.replace(each: re, in: s, with: "")
+    Error(_) -> s
+  }
+}
+
+// --- Per-command help (`caffeine help <cmd>` / `caffeine <cmd> --help`) ---
+
+/// Render help for a single subcommand. Layout:
+///
+///     caffeine compile — Compile measurements + expectations to a target
+///
+///     Usage:
+///       caffeine compile <measurements_dir> <expectations_dir> [output_path]
+///
+///     <description>
+///
+///     Flags:
+///       --target=<...>   Codegen target ...
+///       --quiet          Suppress ...
+///
+///     Examples:
+///       caffeine compile measurements/ expectations/
+pub fn render_command(spec: CommandSpec, color_mode: ColorMode) -> String {
+  let header =
+    color.bold(color.amber("caffeine " <> spec.name, color_mode), color_mode)
+    <> color.dim(" — " <> spec.summary, color_mode)
+
+  let invocation = drop_usage_prefix(args.usage_message(spec))
+  let usage =
+    color.bold(color.cyan("Usage:", color_mode), color_mode)
+    <> "\n  "
+    <> invocation
+
+  let description = spec.description
+
+  let flags_section = case spec.flags {
+    [] -> ""
+    flag_specs -> {
+      let lines =
+        flag_specs
+        |> list.map(format_per_command_flag(_, color_mode))
+        |> string.join("\n")
+      "\n\n"
+      <> color.bold(color.cyan("Flags:", color_mode), color_mode)
+      <> "\n"
+      <> lines
+    }
+  }
+
+  let examples_section = case spec.examples {
+    [] -> ""
+    examples ->
+      "\n\n"
+      <> color.bold(color.cyan("Examples:", color_mode), color_mode)
+      <> "\n"
+      <> {
+        examples
+        |> list.map(fn(e) { "  " <> color.dim(e, color_mode) })
+        |> string.join("\n")
+      }
+  }
+
+  string.join(
+    [header, "", usage, "", description <> flags_section <> examples_section],
+    "\n",
+  )
+}
+
+/// Format one flag row for per-command help (slightly tighter than the
+/// global FLAGS section: 28-col gutter rather than 30).
+fn format_per_command_flag(flag: args.FlagSpec, color_mode: ColorMode) -> String {
+  let pad = case 28 - string.length(flag.name) {
+    n if n > 0 -> string.repeat(" ", n)
+    _ -> "  "
+  }
+  "  "
+  <> color.cyan(flag.name, color_mode)
+  <> pad
+  <> color.dim(flag.description, color_mode)
+}
+
+/// `args.usage_message` returns "Usage: caffeine compile <args>". The
+/// per-command help already shows "Usage:" as a section heading, so we
+/// strip the leading "Usage: " and indent the bare invocation line.
+fn drop_usage_prefix(s: String) -> String {
+  case string.split_once(s, "Usage: ") {
+    Ok(#(_, rest)) -> rest
     Error(_) -> s
   }
 }

@@ -1,3 +1,4 @@
+import caffeine_cli/args
 import caffeine_cli/color
 import caffeine_cli/compile_presenter.{
   type LogLevel, type Presentation, Presentation,
@@ -44,10 +45,7 @@ pub fn run_compile(
     case positional {
       [m, e, o, ..] -> Ok(#(m, e, option.Some(o)))
       [m, e] -> Ok(#(m, e, option.None))
-      _ ->
-        Error(
-          "Usage: caffeine compile <measurements_dir> <expectations_dir> [output_path]",
-        )
+      _ -> Error(args.usage_for("compile"))
     },
   )
 
@@ -66,7 +64,7 @@ pub fn run_validate(
 ) -> Result(Nil, String) {
   use #(measurements_dir, expectations_dir) <- result.try(case positional {
     [m, e, ..] -> Ok(#(m, e))
-    _ -> Error("Usage: caffeine validate <measurements_dir> <expectations_dir>")
+    _ -> Error(args.usage_for("validate"))
   })
 
   use target <- result.try(validate_target(target))
@@ -91,7 +89,7 @@ pub fn run_format(
 ) -> Result(Nil, String) {
   use path <- result.try(case positional {
     [p, ..] -> Ok(p)
-    _ -> Error("Usage: caffeine format <path>")
+    _ -> Error(args.usage_for("format"))
   })
 
   let log_level = log_level_from_quiet(quiet)
@@ -139,7 +137,8 @@ pub fn run_explain(positional: List(String)) -> Result(Nil, String) {
 }
 
 fn explain_usage_message() -> String {
-  "Usage: caffeine explain <CODE>\n\n"
+  args.usage_for("explain")
+  <> "\n\n"
   <> "Examples:\n"
   <> "  caffeine explain E100\n"
   <> "  caffeine explain e303"

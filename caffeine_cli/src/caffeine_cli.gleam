@@ -1,4 +1,5 @@
 import argv
+import caffeine_cli/args
 import caffeine_cli/color
 import caffeine_cli/distance
 import caffeine_cli/handler
@@ -9,7 +10,7 @@ import gleam/bool
 import gleam/dict.{type Dict}
 import gleam/io
 import gleam/list
-import gleam/option
+import gleam/option.{type Option, None, Some}
 import gleam/result
 import gleam/string
 
@@ -61,21 +62,57 @@ pub fn run_with_output(
     },
   )
 
-  use <- bool.lazy_guard(
-    has_flag(parsed.flags, "help")
-      || has_flag(parsed.flags, "h")
-      || parsed.command == "",
-    fn() {
+  case help_target(parsed) {
+    Some(rendering) -> {
       let caps = tty.detect(tty.Auto)
       let mode = color.from_capabilities(caps)
-      let no_theme_flag = get_bool_flag(parsed.flags, "no-theme")
-      let chosen_theme = theme.resolve(no_theme_flag)
-      output(help.render(mode, chosen_theme, caps.unicode))
+      let chosen_theme = theme.resolve(get_bool_flag(parsed.flags, "no-theme"))
+      let text = case rendering {
+        TopLevelHelp -> help.render(mode, chosen_theme, caps.unicode)
+        CommandHelp(spec) -> help.render_command(spec, mode)
+      }
+      output(text)
       Ok(Nil)
-    },
-  )
+    }
+    None -> dispatch(parsed)
+  }
+}
 
-  dispatch(parsed)
+/// What kind of help (if any) the parsed args ask for.
+type HelpRendering {
+  TopLevelHelp
+  CommandHelp(args.CommandSpec)
+}
+
+/// Decide whether the parsed args are asking for help, and if so for what.
+///
+/// Triggers (in order):
+///   - command is empty or `help` with no usable arg → top-level
+///   - command is `help <X>` and X is a known subcommand → per-command
+///   - command is a known subcommand and `--help`/`-h` was passed → per-command
+///   - any other `--help`/`-h` (with unknown command) → top-level
+fn help_target(parsed: ParsedArgs) -> Option(HelpRendering) {
+  let asked_via_flag =
+    has_flag(parsed.flags, "help") || has_flag(parsed.flags, "h")
+
+  case parsed.command, asked_via_flag {
+    "", _ -> Some(TopLevelHelp)
+    "help", _ ->
+      case parsed.positional {
+        [name, ..] ->
+          case args.find(name) {
+            Some(spec) -> Some(CommandHelp(spec))
+            None -> Some(TopLevelHelp)
+          }
+        [] -> Some(TopLevelHelp)
+      }
+    name, True ->
+      case args.find(name) {
+        Some(spec) -> Some(CommandHelp(spec))
+        None -> Some(TopLevelHelp)
+      }
+    _, False -> None
+  }
 }
 
 // --- Private functions ---
@@ -179,21 +216,16 @@ fn dispatch(parsed: ParsedArgs) -> Result(Nil, String) {
   }
 }
 
-/// Known top-level subcommands. Kept in sync with `dispatch/1`'s match
-/// arms; used both for the unknown-command did-you-mean and (by future
-/// PRs) for shell-completion generation.
-const known_commands: List(String) = [
-  "compile", "validate", "format", "artifacts", "types", "explain", "lsp",
-]
-
 /// Build the error message shown when the user types a command Caffeine
 /// doesn't know. Includes a did-you-mean when one of the known commands
-/// is within edit distance 2.
+/// is within edit distance 2. Candidates come from `args.command_names()`
+/// plus the `help` meta-command (which is dispatched specially above and
+/// would otherwise be missing from the list).
 fn unknown_command_message(command: String) -> String {
-  let suffix = case distance.nearest(command, known_commands, max_distance: 2) {
-    option.Some(near) -> "\n\nDid you mean `" <> near <> "`?"
-    option.None ->
-      "\n\nKnown commands: " <> string.join(known_commands, ", ")
+  let candidates = ["help", ..args.command_names()]
+  let suffix = case distance.nearest(command, candidates, max_distance: 2) {
+    Some(near) -> "\n\nDid you mean `" <> near <> "`?"
+    None -> "\n\nKnown commands: " <> string.join(candidates, ", ")
   }
   "Unknown command: " <> command <> suffix
 }

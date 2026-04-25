@@ -1,6 +1,8 @@
+import caffeine_cli/args
 import caffeine_cli/color
 import caffeine_cli/compile_presenter.{Plain, Themed}
 import caffeine_cli/help
+import gleam/option.{Some}
 import gleam/string
 import gleeunit/should
 
@@ -90,6 +92,59 @@ pub fn plain_lists_all_commands_test() {
   let out = help.render(off, Plain, True)
   ["compile", "validate", "format", "artifacts", "types", "lsp"]
   |> all_present(out)
+}
+
+// --- Per-command help (`caffeine help <cmd>` / `caffeine <cmd> --help`) ---
+
+pub fn render_command_includes_name_and_summary_test() {
+  let assert Some(spec) = args.find("compile")
+  let out = help.render_command(spec, off)
+  string.contains(out, "caffeine compile") |> should.be_true
+  string.contains(out, spec.summary) |> should.be_true
+}
+
+pub fn render_command_shows_usage_signature_test() {
+  let assert Some(spec) = args.find("compile")
+  let out = help.render_command(spec, off)
+  string.contains(out, "Usage:") |> should.be_true
+  string.contains(out, "<measurements_dir>") |> should.be_true
+  string.contains(out, "[output_path]") |> should.be_true
+}
+
+pub fn render_command_shows_description_test() {
+  let assert Some(spec) = args.find("validate")
+  let out = help.render_command(spec, off)
+  // Non-trivial substring of validate's description.
+  string.contains(out, "skip ") |> should.be_true
+}
+
+pub fn render_command_shows_flags_when_present_test() {
+  let assert Some(spec) = args.find("compile")
+  let out = help.render_command(spec, off)
+  string.contains(out, "Flags:") |> should.be_true
+  string.contains(out, "--target") |> should.be_true
+  string.contains(out, "--quiet") |> should.be_true
+}
+
+pub fn render_command_omits_flags_section_when_none_test() {
+  let assert Some(spec) = args.find("explain")
+  let out = help.render_command(spec, off)
+  // explain has no per-command flags.
+  string.contains(out, "Flags:") |> should.be_false
+}
+
+pub fn render_command_shows_examples_test() {
+  let assert Some(spec) = args.find("compile")
+  let out = help.render_command(spec, off)
+  string.contains(out, "Examples:") |> should.be_true
+  string.contains(out, "caffeine compile measurements/ expectations/")
+  |> should.be_true
+}
+
+pub fn render_command_color_off_has_no_escapes_test() {
+  let assert Some(spec) = args.find("compile")
+  let out = help.render_command(spec, off)
+  string.contains(out, "\u{001b}[") |> should.be_false
 }
 
 // --- Helpers ---
