@@ -15,76 +15,76 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-      with:
-        persist-credentials: false
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          persist-credentials: false
 
-    - name: Setup BEAM (Erlang + Gleam + rebar3)
-      uses: erlef/setup-beam@e6d7c94229049569db56a7ad5a540c051a010af9 # v1
-      with:
-        otp-version: '27'
-        gleam-version: '1.15.4'
-        rebar3-version: '3.25.0'
+      - name: Setup BEAM (Erlang + Gleam + rebar3)
+        uses: erlef/setup-beam@e6d7c94229049569db56a7ad5a540c051a010af9 # v1
+        with:
+          otp-version: "27"
+          gleam-version: "1.16.0"
+          rebar3-version: "3.25.0"
 
-    - name: Test caffeine_cli
-      run: cd caffeine_cli && gleam test
+      - name: Test caffeine_cli
+        run: cd caffeine_cli && gleam test
 
-    - name: Test caffeine_lsp
-      run: cd caffeine_lsp && gleam test
+      - name: Test caffeine_lsp
+        run: cd caffeine_lsp && gleam test
 
   test-javascript:
     name: Test JavaScript Target
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-      with:
-        persist-credentials: false
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          persist-credentials: false
 
-    - name: Setup BEAM (Erlang + Gleam + rebar3)
-      uses: erlef/setup-beam@e6d7c94229049569db56a7ad5a540c051a010af9 # v1
-      with:
-        otp-version: '27'
-        gleam-version: '1.15.4'
-        rebar3-version: '3.25.0'
+      - name: Setup BEAM (Erlang + Gleam + rebar3)
+        uses: erlef/setup-beam@e6d7c94229049569db56a7ad5a540c051a010af9 # v1
+        with:
+          otp-version: "27"
+          gleam-version: "1.16.0"
+          rebar3-version: "3.25.0"
 
-    - name: Setup Node.js
-      uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6
-      with:
-        node-version: '20'
+      - name: Setup Node.js
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6
+        with:
+          node-version: "20"
 
-    - name: Test caffeine_cli (JavaScript)
-      run: cd caffeine_cli && gleam test --target javascript
+      - name: Test caffeine_cli (JavaScript)
+        run: cd caffeine_cli && gleam test --target javascript
 
-    - name: Test caffeine_lsp (JavaScript)
-      run: cd caffeine_lsp && gleam test --target javascript
+      - name: Test caffeine_lsp (JavaScript)
+        run: cd caffeine_lsp && gleam test --target javascript
 
   test-lsp-e2e:
     name: Test LSP End-to-End
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-      with:
-        persist-credentials: false
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          persist-credentials: false
 
-    - name: Setup BEAM (Erlang + Gleam + rebar3)
-      uses: erlef/setup-beam@e6d7c94229049569db56a7ad5a540c051a010af9 # v1
-      with:
-        otp-version: '27'
-        gleam-version: '1.15.4'
-        rebar3-version: '3.25.0'
+      - name: Setup BEAM (Erlang + Gleam + rebar3)
+        uses: erlef/setup-beam@e6d7c94229049569db56a7ad5a540c051a010af9 # v1
+        with:
+          otp-version: "27"
+          gleam-version: "1.16.0"
+          rebar3-version: "3.25.0"
 
-    - name: Setup Bun
-      uses: oven-sh/setup-bun@v2
-      with:
-        bun-version: "latest"
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "latest"
 
-    - name: Install npm dependencies
-      run: bun install
+      - name: Install npm dependencies
+        run: bun install
 
-    - name: Test LSP e2e
-      run: make test-e2e
+      - name: Test LSP e2e
+        run: make test-e2e
