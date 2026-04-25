@@ -1,0 +1,27 @@
+caffeine_cli/src/caffeine_cli/diagnostic.gleam
+  0816a18c5c57e421 1-204
+caffeine_cli/test/caffeine_cli/diagnostic_test.gleam
+  0816a18c5c57e421 1-171
+caffeine_cli/src/caffeine_cli/error_presenter.gleam
+  0816a18c5c57e421 1-7,9-10,14,17-20,23-26,28,30-32,35-37,40-45,47,49-52,55-56,62-73,79-119,122-124,126,129-132,136-138,149,166-184
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "17b96a8951794aea98aa05ba067853468ce8963d",
+  "prompts": {
+    "0816a18c5c57e421": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23f7efaa-7911-43a2-ade4-812286f33ece",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "robertDurst",
+      "messages": [],
+      "total_additions": 514,
+      "total_deletions": 660,
+      "accepted_lines": 497,
+      "overriden_lines": 0
+    }
+  }
+}
