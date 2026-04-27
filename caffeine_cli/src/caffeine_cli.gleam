@@ -213,8 +213,6 @@ fn dispatch(parsed: ParsedArgs) -> Result(Nil, String) {
 
   case parsed.command {
     "compile" -> handler.run_compile(quiet, target, no_theme, parsed.positional)
-    "validate" ->
-      handler.run_validate(quiet, target, no_theme, parsed.positional)
     "format" -> {
       let check = get_bool_flag(parsed.flags, "check")
       handler.run_format(quiet, check, parsed.positional)

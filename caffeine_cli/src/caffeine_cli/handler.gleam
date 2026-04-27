@@ -55,24 +55,6 @@ pub fn run_compile(
   compile(measurements_dir, expectations_dir, output_path, target, pres)
 }
 
-/// Run the validate command.
-@internal
-pub fn run_validate(
-  quiet: Bool,
-  target: String,
-  no_theme: Bool,
-  positional: List(String),
-) -> Result(Nil, String) {
-  use #(measurements_dir, expectations_dir) <- result.try(case positional {
-    [m, e, ..] -> Ok(#(m, e))
-    _ -> Error(args.usage_for("validate"))
-  })
-
-  use target <- result.try(validate_target(target))
-  let pres = presentation(quiet, no_theme)
-  validate(measurements_dir, expectations_dir, target, pres)
-}
-
 fn presentation(quiet: Bool, no_theme: Bool) -> Presentation {
   let caps = tty.detect(tty.Auto)
   Presentation(
@@ -259,23 +241,6 @@ fn compile(
       Ok(Nil)
     }
   }
-}
-
-fn validate(
-  measurements_dir: String,
-  expectations_dir: String,
-  target: String,
-  pres: Presentation,
-) -> Result(Nil, String) {
-  use _output <- result.try(load_and_compile(
-    measurements_dir,
-    expectations_dir,
-    target,
-    pres,
-  ))
-
-  compile_presenter.log(pres.log_level, "Validation passed")
-  Ok(Nil)
 }
 
 /// Discovers, reads, and compiles measurement and expectation files.

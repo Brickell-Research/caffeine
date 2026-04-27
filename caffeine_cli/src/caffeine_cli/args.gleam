@@ -13,7 +13,7 @@ import gleam/option.{type Option, None, Some}
 /// Description of one CLI subcommand.
 pub type CommandSpec {
   CommandSpec(
-    /// The verb the user types — `compile`, `validate`, etc.
+    /// The verb the user types — `compile`, `format`, etc.
     name: String,
     /// One-line summary shown in the top-level commands list.
     summary: String,
@@ -55,22 +55,6 @@ pub fn commands() -> List(CommandSpec) {
         "caffeine compile measurements/ expectations/ build/main.tf",
         "caffeine compile measurements/ expectations/ --target=opentofu",
       ],
-    ),
-    CommandSpec(
-      name: "validate",
-      summary: "Type-check without writing output",
-      signature: "<measurements_dir> <expectations_dir>",
-      description: "Run the same parse/link/analyze pipeline as `compile`, but skip "
-        <> "code generation and produce no files. Useful in CI to gate merges "
-        <> "without touching the build artifacts.",
-      flags: [
-        FlagSpec(
-          "--target=<terraform|opentofu>",
-          "Codegen target (default: terraform)",
-        ),
-        FlagSpec("--quiet", "Suppress compilation progress output"),
-      ],
-      examples: ["caffeine validate measurements/ expectations/"],
     ),
     CommandSpec(
       name: "format",

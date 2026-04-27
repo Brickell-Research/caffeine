@@ -20,7 +20,7 @@ pub fn themed_includes_tagline_test() {
 
 pub fn themed_lists_all_commands_test() {
   let out = help.render(off, Themed, True)
-  ["compile", "validate", "format", "artifacts", "types", "lsp"]
+  ["compile", "format", "artifacts", "types", "lsp"]
   |> all_present(out)
 }
 
@@ -91,7 +91,7 @@ pub fn plain_does_not_use_themed_tagline_test() {
 
 pub fn plain_lists_all_commands_test() {
   let out = help.render(off, Plain, True)
-  ["compile", "validate", "format", "artifacts", "types", "lsp"]
+  ["compile", "format", "artifacts", "types", "lsp"]
   |> all_present(out)
 }
 
@@ -113,10 +113,10 @@ pub fn render_command_shows_usage_signature_test() {
 }
 
 pub fn render_command_shows_description_test() {
-  let assert Some(spec) = args.find("validate")
+  let assert Some(spec) = args.find("format")
   let out = help.render_command(spec, off)
-  // Non-trivial substring of validate's description.
-  string.contains(out, "skip ") |> should.be_true
+  // Non-trivial substring of format's description.
+  string.contains(out, "non-zero") |> should.be_true
 }
 
 pub fn render_command_shows_flags_when_present_test() {

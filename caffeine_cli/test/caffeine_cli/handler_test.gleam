@@ -71,63 +71,6 @@ pub fn cli_exit_code_test() {
   |> should.be_error()
 }
 
-// ==== Validate Command ====
-// * ✅ successful validate returns Ok
-// * ✅ validate with nonexistent measurement file returns Error
-// * ✅ validate with nonexistent expectations dir returns Error
-// * ✅ validate with --target=terraform returns Ok
-// * ✅ validate with --target=opentofu returns Ok
-// * ✅ validate with --target=invalid returns Error
-pub fn validate_exit_code_test() {
-  caffeine_cli.run([
-    "validate",
-    "--quiet",
-    "test/fixtures/compiler/happy_path_single_measurements_dir",
-    "test/fixtures/compiler/happy_path_single_expectations",
-  ])
-  |> should.be_ok()
-
-  caffeine_cli.run([
-    "validate", "--quiet", "/nonexistent/path.caffeine", "/nonexistent/dir",
-  ])
-  |> should.be_error()
-
-  caffeine_cli.run([
-    "validate",
-    "--quiet",
-    "test/fixtures/compiler/happy_path_single_measurements_dir",
-    "/nonexistent/expectations",
-  ])
-  |> should.be_error()
-
-  caffeine_cli.run([
-    "validate",
-    "--quiet",
-    "--target=terraform",
-    "test/fixtures/compiler/happy_path_single_measurements_dir",
-    "test/fixtures/compiler/happy_path_single_expectations",
-  ])
-  |> should.be_ok()
-
-  caffeine_cli.run([
-    "validate",
-    "--quiet",
-    "--target=opentofu",
-    "test/fixtures/compiler/happy_path_single_measurements_dir",
-    "test/fixtures/compiler/happy_path_single_expectations",
-  ])
-  |> should.be_ok()
-
-  caffeine_cli.run([
-    "validate",
-    "--quiet",
-    "--target=invalid",
-    "test/fixtures/compiler/happy_path_single_measurements_dir",
-    "test/fixtures/compiler/happy_path_single_expectations",
-  ])
-  |> should.be_error()
-}
-
 // ==== Format Command ====
 // * ✅ format a well-formatted file returns Ok
 // * ✅ format --check on a well-formatted file returns Ok

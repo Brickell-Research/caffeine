@@ -29,21 +29,11 @@ Download pre-built binaries for Linux (x64/ARM64), macOS (x64/ARM64), and Window
 
 ```bash
 caffeine compile <measurements_dir> <expectations_dir> [output_path]
-caffeine validate <measurements_dir> <expectations_dir>
 caffeine format <path> [--check]
 caffeine lsp        # Start the Language Server
 caffeine artifacts  # List SLO params
 caffeine types      # Show type system reference
 ```
-
-## Architecture
-
-This repo contains:
-- **caffeine_cli** — CLI wrapping the compiler (compile, validate, format, etc.)
-- **caffeine_lsp** — Language Server Protocol implementation (diagnostics, hover, completion, go-to-definition, and more)
-- **TypeScript LSP transport** — thin bridge between `vscode-languageserver-node` and compiled Gleam
-
-The compiler core ([`caffeine_lang`](https://github.com/Brickell-Research/caffeine_lang)) is a separate Gleam library consumed from [Hex](https://hex.pm/packages/caffeine_lang).
 
 ## Development
 
