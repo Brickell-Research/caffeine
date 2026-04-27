@@ -1,0 +1,34 @@
+caffeine_cli/src/caffeine_cli/args.gleam
+  14a191267fd90fbe 16
+caffeine_cli/test/caffeine_cli/args_test.gleam
+  14a191267fd90fbe 11
+caffeine_cli/test/caffeine_cli/distance_test.gleam
+  14a191267fd90fbe 37,50,61
+caffeine_cli/test/caffeine_cli/help_test.gleam
+  14a191267fd90fbe 23,94,116,118-119
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "104ff464d170dbf1d608c64a0f80ae37f0afff25",
+  "prompts": {
+    "14a191267fd90fbe": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9824aa0f-f914-4d19-baa7-387bd654de12",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "robertDurst",
+      "messages": [],
+      "total_additions": 10,
+      "total_deletions": 130,
+      "accepted_lines": 10,
+      "overriden_lines": 0
+    }
+  },
+  "humans": {
+    "h_bf999c3f841c45": {
+      "author": "robertDurst"
+    }
+  }
+}
