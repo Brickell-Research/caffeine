@@ -42,24 +42,24 @@ pub fn is_newer_handles_v_prefix_via_github_helper_test() {
 // --- github.extract_tag (JSON peek without a JSON dep) ---
 
 pub fn extract_tag_strips_v_test() {
-  let body = "{\"tag_name\": \"v5.1.1\", \"name\": \"5.1.1\"}"
-  github.extract_tag(body) |> should.equal(Ok("5.1.1"))
+  let body = "{\"tag_name\": \"v5.2.0\", \"name\": \"5.2.0\"}"
+  github.extract_tag(body) |> should.equal(Ok("5.2.0"))
 }
 
 pub fn extract_tag_without_v_test() {
-  let body = "{\"tag_name\": \"5.1.1\"}"
-  github.extract_tag(body) |> should.equal(Ok("5.1.1"))
+  let body = "{\"tag_name\": \"5.2.0\"}"
+  github.extract_tag(body) |> should.equal(Ok("5.2.0"))
 }
 
 pub fn extract_tag_picks_first_match_test() {
   // Real GitHub responses sometimes have multiple `tag_name` mentions in
   // nested objects (e.g. `target_commitish` blobs). The hand-rolled
   // splitter takes the first occurrence — assert that contract.
-  let body = "{\"tag_name\": \"v5.1.1\", \"author\": {\"tag_name\": \"junk\"}}"
-  github.extract_tag(body) |> should.equal(Ok("5.1.1"))
+  let body = "{\"tag_name\": \"v5.2.0\", \"author\": {\"tag_name\": \"junk\"}}"
+  github.extract_tag(body) |> should.equal(Ok("5.2.0"))
 }
 
 pub fn extract_tag_missing_returns_error_test() {
-  github.extract_tag("{\"name\": \"5.1.1\"}") |> should.equal(Error(Nil))
+  github.extract_tag("{\"name\": \"5.2.0\"}") |> should.equal(Error(Nil))
   github.extract_tag("") |> should.equal(Error(Nil))
 }
