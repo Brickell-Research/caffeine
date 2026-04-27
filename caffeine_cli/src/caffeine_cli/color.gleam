@@ -69,6 +69,13 @@ pub fn amber(text: String, mode: ColorMode) -> String {
 /// or alternate renderers can reference the same value.
 pub const amber_hex: Int = 0xC9_7B_3F
 
+/// Brand pink. Matches the star in the Brickell Research logo.
+pub fn pink(text: String, mode: ColorMode) -> String {
+  apply(text, mode, fn(t) { ansi.hex(t, pink_hex) })
+}
+
+pub const pink_hex: Int = 0xE5_7B_B8
+
 pub fn bold(text: String, mode: ColorMode) -> String {
   apply(text, mode, ansi.bold)
 }

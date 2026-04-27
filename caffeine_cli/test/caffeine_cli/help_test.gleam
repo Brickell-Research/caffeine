@@ -14,7 +14,7 @@ const on = color.ColorEnabled
 
 pub fn themed_includes_tagline_test() {
   let out = help.render(off, Themed, True)
-  string.contains(out, "reliability artifacts, freshly compiled.")
+  string.contains(out, "Systems thinking, without the thinking.")
   |> should.be_true
 }
 
@@ -86,7 +86,7 @@ pub fn plain_does_not_use_box_drawing_test() {
 
 pub fn plain_does_not_use_themed_tagline_test() {
   let out = help.render(off, Plain, True)
-  string.contains(out, "freshly compiled") |> should.be_false
+  string.contains(out, "Systems thinking") |> should.be_false
 }
 
 pub fn plain_lists_all_commands_test() {

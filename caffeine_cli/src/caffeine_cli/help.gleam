@@ -22,9 +22,9 @@ type Flag {
   Flag(name: String, description: String)
 }
 
-const tagline: String = "reliability artifacts, freshly compiled."
+const tagline: String = "Systems thinking, without the thinking."
 
-const docs_url: String = "https://caffeine.brickellresearch.org"
+const docs_url: String = "https://brickellresearch.org"
 
 const box_inner_width: Int = 72
 
@@ -53,11 +53,7 @@ pub fn render(color_mode: ColorMode, theme: Theme, unicode: Bool) -> String {
 // --- Themed presentation ---
 
 fn render_themed(color_mode: ColorMode, unicode: Bool) -> String {
-  let banner =
-    color.bold(color.amber("caffeine", color_mode), color_mode)
-    <> " "
-    <> constants.version
-    <> color.dim(" — " <> tagline, color_mode)
+  let banner = render_banner(unicode, color_mode)
 
   let usage =
     color.bold(color.cyan("Usage:", color_mode), color_mode)
@@ -75,15 +71,43 @@ fn render_themed(color_mode: ColorMode, unicode: Bool) -> String {
     <> "\n"
     <> flag_lines
 
-  let docs =
-    color.bold(color.cyan("Docs:", color_mode), color_mode)
-    <> "   "
-    <> color.dim(docs_url, color_mode)
+  string.join([banner, "", usage, "", cmd_box, "", flags_section], "\n")
+}
 
-  string.join(
-    [banner, "", usage, "", cmd_box, "", flags_section, "", docs],
-    "\n",
-  )
+/// Compact 3-line banner: a pixel-block coffee mug on the left, a
+/// vertically-stacked text block on the right (wordmark+version, tagline,
+/// docs URL). Inspired by the Claude Code CLI's logo-plus-info banner.
+/// Falls back to a plain wordmark line in non-Unicode terminals.
+fn render_banner(unicode: Bool, color_mode: ColorMode) -> String {
+  let pink = fn(s) { color.pink(s, color_mode) }
+  let c_mark = color.bold(color.amber("C", color_mode), color_mode)
+  let wordmark =
+    color.bold(color.amber("caffeine", color_mode), color_mode)
+    <> " "
+    <> constants.version
+  let slogan = color.dim(tagline, color_mode)
+  let docs = color.dim(docs_url, color_mode)
+
+  let dim = fn(s) { color.dim(s, color_mode) }
+  case unicode {
+    True ->
+      string.join(
+        [
+          dim("   ~"),
+          dim("  ~ ~"),
+          pink(" ▄▄▄▄▄"),
+          pink(" █   █╮") <> "    " <> wordmark,
+          pink(" █ ") <> c_mark <> pink(" █│") <> "    " <> slogan,
+          pink(" █   █╯") <> "    " <> docs,
+          pink(" ▀▀▀▀▀"),
+        ],
+        "\n",
+      )
+    False ->
+      // ASCII fallback: pixel-block art doesn't degrade gracefully, so
+      // skip the mug and just show the text on its own.
+      string.join([wordmark, slogan, docs], "\n")
+  }
 }
 
 fn commands_to_lines(color_mode: ColorMode) -> List(String) {
