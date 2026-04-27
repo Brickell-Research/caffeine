@@ -1,0 +1,30 @@
+caffeine_lsp/manifest.toml
+  14a191267fd90fbe 10
+caffeine_cli/manifest.toml
+  14a191267fd90fbe 14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "9c2d2a1b039553753558420a85a3d28c2efa962a",
+  "prompts": {
+    "14a191267fd90fbe": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9824aa0f-f914-4d19-baa7-387bd654de12",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "robertDurst",
+      "messages": [],
+      "total_additions": 60,
+      "total_deletions": 88,
+      "accepted_lines": 71,
+      "overriden_lines": 0
+    }
+  },
+  "humans": {
+    "h_bf999c3f841c45": {
+      "author": "robertDurst"
+    }
+  }
+}
