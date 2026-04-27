@@ -32,7 +32,7 @@ pub fn themed_lists_all_flags_test() {
 
 pub fn themed_includes_docs_url_test() {
   let out = help.render(off, Themed, True)
-  string.contains(out, "https://caffeine.brickellresearch.org")
+  string.contains(out, "https://brickellresearch.org")
   |> should.be_true
 }
 
