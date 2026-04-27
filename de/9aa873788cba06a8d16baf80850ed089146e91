@@ -1,0 +1,42 @@
+caffeine_lsp/src/caffeine_lsp/type_hierarchy.gleam
+  14a191267fd90fbe 49-52
+caffeine_lsp/src/caffeine_lsp/linker_diagnostics.gleam
+  14a191267fd90fbe 66-71,116-121
+caffeine_lsp/src/caffeine_lsp/definition.gleam
+  14a191267fd90fbe 72-75
+caffeine_lsp/src/caffeine_lsp/diagnostics.gleam
+  14a191267fd90fbe 430-432
+caffeine_lsp/src/caffeine_lsp/hover.gleam
+  14a191267fd90fbe 275-278
+caffeine_lsp/src/caffeine_lsp/position_utils.gleam
+  14a191267fd90fbe 216-220
+caffeine_lsp/src/caffeine_lsp/workspace_symbols.gleam
+  14a191267fd90fbe 97-100
+caffeine_lsp/src/caffeine_lsp/inlay_hints.gleam
+  14a191267fd90fbe 118-127
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "de9aa873788cba06a8d16baf80850ed089146e91",
+  "prompts": {
+    "14a191267fd90fbe": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9824aa0f-f914-4d19-baa7-387bd654de12",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "robertDurst",
+      "messages": [],
+      "total_additions": 46,
+      "total_deletions": 19,
+      "accepted_lines": 105,
+      "overriden_lines": 0
+    }
+  },
+  "humans": {
+    "h_bf999c3f841c45": {
+      "author": "robertDurst"
+    }
+  }
+}
