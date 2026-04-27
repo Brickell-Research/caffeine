@@ -30,7 +30,6 @@ Download pre-built binaries for Linux (x64/ARM64), macOS (x64/ARM64), and Window
 ```bash
 caffeine compile <measurements_dir> <expectations_dir> [output_path]
 caffeine format <path> [--check]
-caffeine lsp        # Start the Language Server
 caffeine artifacts  # List SLO params
 caffeine types      # Show type system reference
 ```
