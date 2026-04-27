@@ -20,7 +20,7 @@ pub fn themed_includes_tagline_test() {
 
 pub fn themed_lists_all_commands_test() {
   let out = help.render(off, Themed, True)
-  ["compile", "format", "artifacts", "types", "lsp"]
+  ["compile", "format", "artifacts", "types"]
   |> all_present(out)
 }
 
@@ -91,7 +91,7 @@ pub fn plain_does_not_use_themed_tagline_test() {
 
 pub fn plain_lists_all_commands_test() {
   let out = help.render(off, Plain, True)
-  ["compile", "format", "artifacts", "types", "lsp"]
+  ["compile", "format", "artifacts", "types"]
   |> all_present(out)
 }
 

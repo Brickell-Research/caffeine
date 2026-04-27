@@ -37,9 +37,6 @@ import {
   handleInlayHints,
   handleHighlight,
   handleFormatting,
-  handleCodeAction,
-  handlePrepareRename,
-  handleRename,
   handleDocumentSymbol,
   handleSemanticTokens,
   handleFoldingRanges,
@@ -95,9 +92,6 @@ export function registerHandlers(ctx: HandlerContext): void {
   ctx.connection.onDocumentHighlight((p) => handleHighlight(ctx, p));
   ctx.connection.onReferences((p) => handleReferences(ctx, p));
   ctx.connection.onDocumentFormatting((p) => handleFormatting(ctx, p));
-  ctx.connection.onCodeAction((p) => handleCodeAction(ctx, p));
-  ctx.connection.onPrepareRename((p) => handlePrepareRename(ctx, p));
-  ctx.connection.onRenameRequest((p) => handleRename(ctx, p));
   ctx.connection.onDocumentSymbol((p) => handleDocumentSymbol(ctx, p));
   ctx.connection.languages.semanticTokens.on((p) => handleSemanticTokens(ctx, p));
   ctx.connection.onFoldingRanges((p) => handleFoldingRanges(ctx, p));
@@ -214,7 +208,6 @@ function registerInitializeHandler(ctx: HandlerContext): void {
         declarationProvider: true,
         documentHighlightProvider: true,
         referencesProvider: true,
-        renameProvider: { prepareProvider: true },
         foldingRangeProvider: true,
         selectionRangeProvider: true,
         linkedEditingRangeProvider: true,
@@ -231,9 +224,6 @@ function registerInitializeHandler(ctx: HandlerContext): void {
         },
         inlayHintProvider: true,
         codeLensProvider: { resolveProvider: false },
-        codeActionProvider: {
-          codeActionKinds: ["quickfix"],
-        },
         semanticTokensProvider: {
           legend: {
             tokenTypes: gleamArray(token_types as GleamList),

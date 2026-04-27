@@ -93,14 +93,6 @@ pub fn run_types(quiet: Bool) -> Result(Nil, String) {
   types_catalog(log_level_from_quiet(quiet), color.detect_color_mode())
 }
 
-/// Run the lsp command.
-@internal
-pub fn run_lsp() -> Result(Nil, String) {
-  Error(
-    "LSP mode requires the compiled binary (main.mjs intercepts this argument)",
-  )
-}
-
 /// Run the explain command: look up prose for an error code and render it.
 @internal
 pub fn run_explain(positional: List(String)) -> Result(Nil, String) {

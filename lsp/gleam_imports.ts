@@ -45,11 +45,6 @@ export {
   get_relation_ref_with_range_at_position,
 } from "../caffeine_lsp/build/dev/javascript/caffeine_lsp/caffeine_lsp/definition.mjs";
 
-export {
-  get_code_actions,
-  ActionDiagnostic,
-} from "../caffeine_lsp/build/dev/javascript/caffeine_lsp/caffeine_lsp/code_actions.mjs";
-
 export { format } from "../caffeine_lsp/build/dev/javascript/caffeine_lang/caffeine_lang/frontend/formatter.mjs";
 
 export { get_highlights } from "../caffeine_lsp/build/dev/javascript/caffeine_lsp/caffeine_lsp/highlight.mjs";
@@ -59,11 +54,6 @@ export {
   get_measurement_name_at,
   find_references_to_name,
 } from "../caffeine_lsp/build/dev/javascript/caffeine_lsp/caffeine_lsp/references.mjs";
-
-export {
-  prepare_rename,
-  get_rename_edits,
-} from "../caffeine_lsp/build/dev/javascript/caffeine_lsp/caffeine_lsp/rename.mjs";
 
 export { get_folding_ranges } from "../caffeine_lsp/build/dev/javascript/caffeine_lsp/caffeine_lsp/folding_range.mjs";
 

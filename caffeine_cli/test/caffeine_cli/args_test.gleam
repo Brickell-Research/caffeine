@@ -8,7 +8,7 @@ import gleeunit/should
 
 pub fn commands_lists_all_subcommands_test() {
   let names = args.command_names()
-  ["compile", "format", "artifacts", "types", "explain", "lsp"]
+  ["compile", "format", "artifacts", "types", "explain"]
   |> list.each(fn(expected) {
     case list.contains(names, expected) {
       True -> Nil

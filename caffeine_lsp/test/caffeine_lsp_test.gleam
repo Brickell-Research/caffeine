@@ -1,4 +1,3 @@
-import caffeine_lsp/code_actions
 import caffeine_lsp/completion
 import caffeine_lsp/definition
 import caffeine_lsp/diagnostics
@@ -14,7 +13,6 @@ import caffeine_lsp/linker_diagnostics
 import caffeine_lsp/lsp_types
 import caffeine_lsp/position_utils
 import caffeine_lsp/references
-import caffeine_lsp/rename
 import caffeine_lsp/selection_range.{type SelectionRange, HasParent, NoParent}
 import caffeine_lsp/semantic_tokens
 import caffeine_lsp/signature_help
@@ -718,51 +716,6 @@ pub fn relation_ref_empty_content_returns_none_test() {
 }
 
 // ==========================================================================
-// Code action tests
-// ==========================================================================
-
-pub fn code_actions_quoted_field_name_test() {
-  let diags = [
-    code_actions.ActionDiagnostic(
-      line: 2,
-      character: 4,
-      end_line: 2,
-      end_character: 9,
-      message: "Field names should not be quoted. Use 'env' instead of '\"env\"'",
-      code: diagnostics.QuotedFieldName,
-    ),
-  ]
-
-  let actions = code_actions.get_code_actions(diags, "file:///test.caffeine")
-  { actions != [] } |> should.be_true()
-
-  case actions {
-    [action, ..] -> {
-      action.title |> should.equal("Remove quotes from field name")
-      action.kind |> should.equal("quickfix")
-      action.is_preferred |> should.be_true()
-    }
-    [] -> should.fail()
-  }
-}
-
-pub fn code_actions_no_matching_diagnostic_test() {
-  let diags = [
-    code_actions.ActionDiagnostic(
-      line: 0,
-      character: 0,
-      end_line: 0,
-      end_character: 5,
-      message: "Some other error",
-      code: diagnostics.NoDiagnosticCode,
-    ),
-  ]
-
-  let actions = code_actions.get_code_actions(diags, "file:///test.caffeine")
-  actions |> should.equal([])
-}
-
-// ==========================================================================
 // Position utils tests
 // ==========================================================================
 
@@ -1148,47 +1101,6 @@ pub fn find_references_to_name_not_found_test() {
   let source =
     "Expectations measured by \"api\"\n  * \"checkout\":\n    Provides { status: true }\n"
   references.find_references_to_name(source, "missing")
-  |> should.equal([])
-}
-
-// ==========================================================================
-// Rename tests
-// ==========================================================================
-
-// ==== prepare_rename ====
-// * returns range for valid symbol
-// * returns None for keyword
-// ==== get_rename_edits ====
-// * returns all locations for a symbol
-// * returns empty for keyword
-
-pub fn prepare_rename_valid_symbol_test() {
-  let source =
-    "_defaults (Provides): { env: \"production\" }\n\nExpectations measured by \"api\"\n  * \"checkout\" extends [_defaults]:\n    Provides { status: true }\n"
-  case rename.prepare_rename(source, 0, 2) {
-    option.Some(#(0, 0, 9)) -> should.be_true(True)
-    _ -> should.fail()
-  }
-}
-
-pub fn prepare_rename_keyword_returns_none_test() {
-  let source =
-    "\"api\":\n  Requires { env: String }\n  Provides { value: \"x\" }\n"
-  rename.prepare_rename(source, 1, 4)
-  |> should.equal(option.None)
-}
-
-pub fn get_rename_edits_all_locations_test() {
-  let source =
-    "_defaults (Provides): { env: \"production\" }\n\nExpectations measured by \"api\"\n  * \"checkout\" extends [_defaults]:\n    Provides { status: true }\n"
-  let edits = rename.get_rename_edits(source, 0, 2)
-  { list.length(edits) >= 2 } |> should.be_true()
-}
-
-pub fn get_rename_edits_keyword_returns_empty_test() {
-  let source =
-    "\"api\":\n  Requires { env: String }\n  Provides { value: \"x\" }\n"
-  rename.get_rename_edits(source, 1, 4)
   |> should.equal([])
 }
 

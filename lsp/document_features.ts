@@ -1,5 +1,5 @@
 // Single-document LSP feature handlers — hover, completion, formatting,
-// code actions, rename, symbols, tokens, folding, selection, linked editing.
+// symbols, tokens, folding, selection, linked editing.
 
 import {
   get_hover,
@@ -8,16 +8,8 @@ import {
   get_inlay_hints,
   get_semantic_tokens,
   get_symbols,
-  get_code_actions,
-  ActionDiagnostic,
-  QuotedFieldName,
-  MeasurementNotFound,
-  DependencyNotFound,
-  NoDiagnosticCode,
   format,
   get_highlights,
-  prepare_rename,
-  get_rename_edits,
   get_folding_ranges,
   get_selection_range,
   get_linked_editing_ranges,
@@ -122,108 +114,6 @@ export function handleFormatting(ctx: HandlerContext, params: any) {
     }
   } catch (e) { debug(`formatting: ${e}`); }
   return [];
-}
-
-// --- Code actions ---
-
-// deno-lint-ignore no-explicit-any
-export function handleCodeAction(_ctx: HandlerContext, params: any) {
-  const uri = params.textDocument.uri;
-
-  try {
-    const gleamDiags = toList(
-      params.context.diagnostics.map(
-        // deno-lint-ignore no-explicit-any
-        (d: any) =>
-          new ActionDiagnostic(
-            d.range.start.line,
-            d.range.start.character,
-            d.range.end.line,
-            d.range.end.character,
-            d.message,
-            d.code === "quoted-field-name" ? new QuotedFieldName()
-              : d.code === "measurement-not-found" ? new MeasurementNotFound()
-              : d.code === "dependency-not-found" ? new DependencyNotFound()
-              : new NoDiagnosticCode(),
-          ),
-      ),
-    );
-
-    const actions = gleamArray(get_code_actions(gleamDiags, uri) as GleamList);
-    return actions.map((action) => {
-      const diag = action.diagnostic;
-      return {
-        title: action.title,
-        kind: action.kind,
-        isPreferred: action.is_preferred,
-        diagnostics: [{
-          message: diag.message,
-          source: "caffeine",
-          range: range(diag.line, diag.character, diag.end_line, diag.end_character),
-        }],
-        edit: {
-          changes: {
-            [action.uri]: gleamArray(action.edits as GleamList).map((e) => ({
-              range: range(e.start_line, e.start_character, e.end_line, e.end_character),
-              newText: e.new_text,
-            })),
-          },
-        },
-      };
-    });
-  } catch (e) {
-    debug(`codeAction: ${e}`);
-    return [];
-  }
-}
-
-// --- Prepare rename ---
-
-// deno-lint-ignore no-explicit-any
-export function handlePrepareRename(ctx: HandlerContext, params: any) {
-  const doc = ctx.documents.get(params.textDocument.uri);
-  if (!doc) return null;
-
-  try {
-    const result = prepare_rename(doc.getText(), params.position.line, params.position.character);
-    if (result instanceof Some) {
-      const [rLine, rCol, rLen] = [result[0][0], result[0][1], result[0][2]];
-      return {
-        range: range(rLine, rCol, rLine, rCol + rLen),
-        placeholder: doc.getText().substring(
-          doc.offsetAt({ line: rLine, character: rCol }),
-          doc.offsetAt({ line: rLine, character: rCol + rLen }),
-        ),
-      };
-    }
-  } catch (e) { debug(`prepareRename: ${e}`); }
-  return null;
-}
-
-// --- Rename ---
-
-// deno-lint-ignore no-explicit-any
-export function handleRename(ctx: HandlerContext, params: any) {
-  const doc = ctx.documents.get(params.textDocument.uri);
-  if (!doc) return null;
-
-  try {
-    const edits = gleamArray(
-      get_rename_edits(doc.getText(), params.position.line, params.position.character) as GleamList,
-    );
-    if (edits.length === 0) return null;
-    return {
-      changes: {
-        [params.textDocument.uri]: edits.map((e) => ({
-          range: range(e[0], e[1], e[0], e[1] + e[2]),
-          newText: params.newName,
-        })),
-      },
-    };
-  } catch (e) {
-    debug(`rename: ${e}`);
-    return null;
-  }
 }
 
 // --- Document symbols ---

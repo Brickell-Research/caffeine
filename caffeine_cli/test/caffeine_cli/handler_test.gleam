@@ -1,5 +1,4 @@
 import caffeine_cli
-import gleam/string
 import gleeunit/should
 
 // ==== CLI Results ====
@@ -110,15 +109,4 @@ pub fn artifacts_exit_code_test() {
 pub fn types_exit_code_test() {
   caffeine_cli.run(["types", "--quiet"])
   |> should.be_ok()
-}
-
-// ==== LSP Command ====
-// * ✅ lsp returns Error with expected message
-pub fn lsp_exit_code_test() {
-  let result = caffeine_cli.run(["lsp"])
-  result |> should.be_error()
-  let assert Error(msg) = result
-  msg
-  |> string.contains("main.mjs")
-  |> should.be_true()
 }

@@ -100,15 +100,6 @@ pub fn commands() -> List(CommandSpec) {
       flags: [],
       examples: ["caffeine explain E100", "caffeine explain e303"],
     ),
-    CommandSpec(
-      name: "lsp",
-      summary: "Start the language server (used by editors)",
-      signature: "",
-      description: "Start the Caffeine Language Server, speaking LSP over stdio. "
-        <> "Editors and IDEs invoke this — you usually don't run it directly.",
-      flags: [],
-      examples: ["caffeine lsp"],
-    ),
   ]
 }
 

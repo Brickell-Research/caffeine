@@ -167,49 +167,6 @@ test("document symbols returns symbols for measurement file", async () => {
   }
 }, 30_000);
 
-// ==== code_actions_quickfix ====
-// * Opens a file with quoted field names, gets diagnostics, requests code actions
-test("code actions returns quickfix for quoted field name", async () => {
-  const client = new LspTestClient(ROOT_DIR);
-  try {
-    await client.start();
-    await client.initialize();
-
-    const uri = fixtureUri("quoted_field.caffeine");
-    const text = await readFixture("quoted_field.caffeine");
-
-    const diagPromise = client.waitForDiagnostics(uri);
-    client.openDocument(uri, text);
-    const diag = await diagPromise;
-
-    // Should have at least one diagnostic for the quoted field name
-    expect(diag.diagnostics.length > 0).toBeTruthy();
-
-    // Find the quoted-field-name diagnostic
-    const quotedDiag = diag.diagnostics.find(
-      (d) => d.code === "quoted-field-name",
-    );
-    expect(quotedDiag).toBeTruthy();
-
-    // Request code actions with the diagnostic
-    const actions = await client.codeActions(uri, quotedDiag!.range, [
-      quotedDiag!,
-    ]);
-
-    expect(Array.isArray(actions)).toBeTruthy();
-    expect(actions.length > 0).toBeTruthy();
-
-    // Verify quickfix structure
-    const quickfix = actions[0];
-    expect(quickfix.kind).toBe("quickfix");
-    expect(quickfix.title.includes("Remove quotes")).toBeTruthy();
-    expect(quickfix.edit).toBeTruthy();
-    expect(quickfix.edit.changes).toBeTruthy();
-  } finally {
-    await client.shutdown();
-  }
-}, 30_000);
-
 // ==== references_for_extendable ====
 // * Opens a file with an extendable and its usage, verifies references are returned
 test("references returns definition and usage for extendable", async () => {

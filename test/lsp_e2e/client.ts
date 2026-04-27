@@ -118,14 +118,8 @@ export class LspTestClient {
             formats: ["relative"],
             requests: { full: true },
           },
-          codeAction: {
-            codeActionLiteralSupport: {
-              codeActionKind: { valueSet: ["quickfix"] },
-            },
-          },
           documentSymbol: {},
           references: {},
-          rename: { prepareSupport: true },
         },
         workspace: {},
       },
@@ -261,19 +255,6 @@ export class LspTestClient {
     });
   }
 
-  /** Send textDocument/codeAction request. */
-  async codeActions(
-    uri: string,
-    range: Range,
-    diagnostics: Diagnostic[],
-  ): Promise<any[]> {
-    return await this.sendRequest("textDocument/codeAction", {
-      textDocument: { uri },
-      range,
-      context: { diagnostics },
-    });
-  }
-
   /** Send textDocument/references request. */
   async references(
     uri: string,
@@ -284,20 +265,6 @@ export class LspTestClient {
       textDocument: { uri },
       position: { line, character },
       context: { includeDeclaration: true },
-    });
-  }
-
-  /** Send textDocument/rename request. */
-  async rename(
-    uri: string,
-    line: number,
-    character: number,
-    newName: string,
-  ): Promise<any | null> {
-    return await this.sendRequest("textDocument/rename", {
-      textDocument: { uri },
-      position: { line, character },
-      newName,
     });
   }
 
