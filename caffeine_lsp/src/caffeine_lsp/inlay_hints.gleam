@@ -115,17 +115,16 @@ fn get_item_hints_acc(
             let new_from = field_line + 1
             case field_line >= start_line && field_line <= end_line {
               False -> #(new_from, hints2)
-              True ->
-                #(new_from, [
-                  InlayHint(
-                    line: field_line,
-                    column: field_col + string.length(field.name),
-                    label: ": " <> type_str <> default_suffix,
-                    kind: 1,
-                    padding_left: True,
-                  ),
-                  ..hints2
-                ])
+              True -> #(new_from, [
+                InlayHint(
+                  line: field_line,
+                  column: field_col + string.length(field.name),
+                  label: ": " <> type_str <> default_suffix,
+                  kind: 1,
+                  padding_left: True,
+                ),
+                ..hints2
+              ])
             }
           }
         }

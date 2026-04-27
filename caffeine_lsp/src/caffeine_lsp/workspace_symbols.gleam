@@ -94,7 +94,10 @@ fn measurement_item_symbol(
   )
 }
 
-fn expect_item_symbol(item: ExpectItem, lines: List(String)) -> WorkspaceSymbol {
+fn expect_item_symbol(
+  item: ExpectItem,
+  lines: List(String),
+) -> WorkspaceSymbol {
   let #(line, col) =
     position_utils.find_name_position_in_lines(lines, item.name)
     |> result.unwrap(#(0, 0))

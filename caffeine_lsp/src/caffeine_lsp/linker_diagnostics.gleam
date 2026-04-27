@@ -63,7 +63,12 @@ pub fn get_linker_diagnostics(
             |> result.map(fn(pos) { pos.0 })
             |> result.unwrap(search_from)
           let new_diags =
-            check_expectation(lines, expectation, measurement_index, anchor_line)
+            check_expectation(
+              lines,
+              expectation,
+              measurement_index,
+              anchor_line,
+            )
           let updated_rev =
             list.fold(new_diags, diags_rev, fn(a, d) { [d, ..a] })
           #(updated_rev, anchor_line + 1)
@@ -108,7 +113,12 @@ fn check_measured_expectation(
       let remaining_params =
         measurement_utils.compute_remaining_params(measurement)
       list.flatten([
-        check_missing_required(lines, expectation, remaining_params, anchor_line),
+        check_missing_required(
+          lines,
+          expectation,
+          remaining_params,
+          anchor_line,
+        ),
         check_unknown_fields(lines, expectation, remaining_params, anchor_line),
         check_type_mismatches(lines, expectation, remaining_params, anchor_line),
       ])

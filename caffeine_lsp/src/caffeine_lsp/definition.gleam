@@ -69,7 +69,10 @@ fn find_in_expects(
   }
 }
 
-fn find_name_location(content: String, name: String) -> Option(#(Int, Int, Int)) {
+fn find_name_location(
+  content: String,
+  name: String,
+) -> Option(#(Int, Int, Int)) {
   case position_utils.find_name_position(content, name) {
     Ok(#(line, col)) -> option.Some(#(line, col, string.length(name)))
     Error(_) -> option.None

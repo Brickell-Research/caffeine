@@ -427,7 +427,9 @@ fn collect_alias_refs_from_value(value: Value) -> List(String) {
 }
 
 /// Recursively collect alias reference names from a parsed type.
-fn collect_alias_refs_from_parsed_type(parsed_type: ParsedType) -> List(String) {
+fn collect_alias_refs_from_parsed_type(
+  parsed_type: ParsedType,
+) -> List(String) {
   case parsed_type {
     ParsedTypeAliasRef(name) -> [name]
     types.ParsedPrimitive(_) -> []

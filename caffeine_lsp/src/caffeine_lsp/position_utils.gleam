@@ -213,7 +213,11 @@ fn find_in_lines(
 
 /// Search for `name` as a whole word within `line`, starting from `offset`.
 /// Returns Ok(column) on match, Error(Nil) if not found.
-fn find_whole_word(line: String, name: String, offset: Int) -> Result(Int, Nil) {
+fn find_whole_word(
+  line: String,
+  name: String,
+  offset: Int,
+) -> Result(Int, Nil) {
   // Guard against empty name: on JS target, split_once("...", "") matches at
   // position 0 with skip=0, causing an infinite loop.
   use <- bool.guard(when: name == "", return: Error(Nil))

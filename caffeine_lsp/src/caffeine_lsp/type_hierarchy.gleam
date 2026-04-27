@@ -46,7 +46,10 @@ pub fn prepare_type_hierarchy(
 }
 
 /// Look up hierarchy item by name in the parsed file.
-fn find_hierarchy_item(content: String, name: String) -> List(TypeHierarchyItem) {
+fn find_hierarchy_item(
+  content: String,
+  name: String,
+) -> List(TypeHierarchyItem) {
   let lines = string.split(content, "\n")
   case file_utils.parse(content) {
     Ok(file_utils.Measurements(file)) -> find_in_measurements(file, lines, name)
