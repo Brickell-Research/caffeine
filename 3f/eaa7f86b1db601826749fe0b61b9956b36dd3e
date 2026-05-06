@@ -1,0 +1,26 @@
+caffeine_cli/manifest.toml
+  s_04750e6b7df285::t_302dd003aa3bd4 14
+caffeine_lsp/manifest.toml
+  s_04750e6b7df285::t_c530bb39ab6d61 10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.1",
+  "base_commit_sha": "3feaa7f86b1db601826749fe0b61b9956b36dd3e",
+  "prompts": {},
+  "humans": {
+    "h_55b93de7ce5e50": {
+      "author": "robertDurst <me@robdurst.com>"
+    }
+  },
+  "sessions": {
+    "s_04750e6b7df285": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4d566ea3-98ee-4369-b3a5-eb37612baefc",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "robertDurst <me@robdurst.com>"
+    }
+  }
+}
