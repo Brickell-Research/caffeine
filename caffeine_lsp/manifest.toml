@@ -7,7 +7,7 @@ packages = [
   ], requirements = [
     "gleam_stdlib",
     "terra_madre",
-  ], otp_app = "caffeine_lang", source = "hex", outer_checksum = "2616F202F258E9B1B2B42F954AB357C9A9FB28D97BCD550752C248BA53D04B5E" },
+  ], otp_app = "caffeine_lang", source = "hex", outer_checksum = "8D54DFA57507AA3FEE48CC58F0EE466CC2037325290E098AFE5F638B1458CA96" },
   { name = "gleam_stdlib", version = "0.71.0", build_tools = [
     "gleam",
   ], requirements = [
