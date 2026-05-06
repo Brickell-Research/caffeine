@@ -1,0 +1,43 @@
+caffeine_cli/gleam.toml
+  h_55b93de7ce5e50 2,9
+caffeine_cli/src/caffeine_cli/github.gleam
+  h_55b93de7ce5e50 14
+caffeine_lsp/gleam.toml
+  h_55b93de7ce5e50 9
+caffeine_cli/test/caffeine_cli/update_check_test.gleam
+  h_55b93de7ce5e50 45-46,50-51,58-59,63
+.github/workflows/release.yml
+  h_55b93de7ce5e50 10
+caffeine_lsp/manifest.toml
+  h_55b93de7ce5e50 5,28
+Makefile
+  h_55b93de7ce5e50 54-55
+caffeine_cli/manifest.toml
+  h_55b93de7ce5e50 9,77
+package.json
+  h_55b93de7ce5e50 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.1",
+  "base_commit_sha": "c3ad0e22d9fed534f6a7d32c3f85b5836ad479c6",
+  "prompts": {
+    "14a191267fd90fbe": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9824aa0f-f914-4d19-baa7-387bd654de12",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "robertDurst <me@robdurst.com>",
+      "total_additions": 83,
+      "total_deletions": 4,
+      "accepted_lines": 54,
+      "overriden_lines": 3
+    }
+  },
+  "humans": {
+    "h_55b93de7ce5e50": {
+      "author": "robertDurst <me@robdurst.com>"
+    }
+  }
+}
