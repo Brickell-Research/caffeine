@@ -1,6 +1,6 @@
 {
   "name": "caffeine",
-  "version": "5.4.0",
+  "version": "5.4.1",
   "type": "module",
   "dependencies": {
     "vscode-languageserver": "^9.0.1",
