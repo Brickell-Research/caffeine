@@ -1,0 +1,30 @@
+package.json
+  h_55b93de7ce5e50 3
+caffeine_cli/src/caffeine_cli/github.gleam
+  h_55b93de7ce5e50 14
+Makefile
+  h_55b93de7ce5e50 54-55
+caffeine_cli/test/caffeine_cli/update_check_test.gleam
+  h_55b93de7ce5e50 45-46,50-51,58-59,63
+caffeine_lsp/manifest.toml
+  h_55b93de7ce5e50 5,28
+caffeine_lsp/gleam.toml
+  h_55b93de7ce5e50 9
+caffeine_cli/manifest.toml
+  h_55b93de7ce5e50 9,77
+caffeine_cli/gleam.toml
+  h_55b93de7ce5e50 2,9
+.github/workflows/release.yml
+  h_55b93de7ce5e50 10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.1",
+  "base_commit_sha": "8faa1e03e952447d851c65056f378df39125164e",
+  "prompts": {},
+  "humans": {
+    "h_55b93de7ce5e50": {
+      "author": "robertDurst <me@robdurst.com>"
+    }
+  }
+}
