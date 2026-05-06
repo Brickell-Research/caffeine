@@ -11,7 +11,7 @@ packages = [
   ], requirements = [
     "gleam_stdlib",
     "terra_madre",
-  ], otp_app = "caffeine_lang", source = "hex", outer_checksum = "109F0342A2E539366F350B802B76379A3F5CF2A9E7449C28CC237854B1DFC435" },
+  ], otp_app = "caffeine_lang", source = "hex", outer_checksum = "2616F202F258E9B1B2B42F954AB357C9A9FB28D97BCD550752C248BA53D04B5E" },
   { name = "envoy", version = "1.1.0", build_tools = [
     "gleam",
   ], requirements = [
