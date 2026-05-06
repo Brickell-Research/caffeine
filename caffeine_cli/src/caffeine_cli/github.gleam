@@ -11,7 +11,7 @@ import shellout
 const repo: String = "Brickell-Research/caffeine"
 
 /// Returns the most recent release tag with any leading `v` stripped
-/// (e.g. `5.2.0`). Errors out silently — the caller turns any failure
+/// (e.g. `5.3.0`). Errors out silently — the caller turns any failure
 /// into "no notice shown" rather than surfacing it.
 pub fn resolve_latest() -> Result(String, Nil) {
   let url = "https://api.github.com/repos/" <> repo <> "/releases/latest"
