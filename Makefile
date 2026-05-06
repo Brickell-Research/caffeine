@@ -51,6 +51,6 @@ dev-link:
 # Restore caffeine_lang dependency to Hex for CI/release.
 dev-unlink:
 	@echo "Restoring caffeine_lang to Hex dependency..."
-	cd caffeine_cli && sed -i '' 's|caffeine_lang = .*|caffeine_lang = ">= 5.3.0 and < 6.0.0"|' gleam.toml
-	cd caffeine_lsp && sed -i '' 's|caffeine_lang = .*|caffeine_lang = ">= 5.3.0 and < 6.0.0"|' gleam.toml
+	cd caffeine_cli && sed -i '' 's|caffeine_lang = .*|caffeine_lang = ">= 5.4.0 and < 6.0.0"|' gleam.toml
+	cd caffeine_lsp && sed -i '' 's|caffeine_lang = .*|caffeine_lang = ">= 5.4.0 and < 6.0.0"|' gleam.toml
 	@echo "Restored. Safe to commit."
