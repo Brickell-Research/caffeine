@@ -57,3 +57,18 @@ make dev-unlink                  # Restore Hex dependency
 - [Website](https://caffeine-lang.run)
 - [Compiler core repo](https://github.com/Brickell-Research/caffeine_lang)
 - [Hex package](https://hex.pm/packages/caffeine_lang)
+
+## Releasing
+
+After publishing a new `caffeine_lang` to Hex, bump the version everywhere
+it appears (`package.json`, both `gleam.toml`s) yourself, then:
+
+```bash
+make release             # refreshes manifest checksums, commits, tags vX.Y.Z
+git push --follow-tags   # triggers the Release workflow
+```
+
+`make release` reads the new version from `caffeine_cli/gleam.toml`, runs
+`gleam deps update caffeine_lang` in both packages so the `outer_checksum`
+in each `manifest.toml` matches what's on Hex, and prints the diff for you
+to confirm before committing.
