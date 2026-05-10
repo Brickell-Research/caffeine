@@ -8,7 +8,7 @@ import gleeunit/should
 
 pub fn commands_lists_all_subcommands_test() {
   let names = args.command_names()
-  ["compile", "format", "artifacts", "types", "explain"]
+  ["compile", "format", "types", "explain"]
   |> list.each(fn(expected) {
     case list.contains(names, expected) {
       True -> Nil
@@ -83,9 +83,9 @@ pub fn usage_message_includes_signature_test() {
 }
 
 pub fn usage_message_omits_signature_for_no_arg_command_test() {
-  let assert Some(spec) = args.find("artifacts")
+  let assert Some(spec) = args.find("types")
   let msg = args.usage_message(spec)
-  msg |> should.equal("Usage: caffeine artifacts")
+  msg |> should.equal("Usage: caffeine types")
 }
 
 // --- usage_for ---

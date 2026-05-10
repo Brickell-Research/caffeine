@@ -34,7 +34,7 @@ pub fn levenshtein_unrelated_test() {
 // --- nearest ---
 
 pub fn nearest_finds_close_match_test() {
-  let candidates = ["compile", "format", "artifacts"]
+  let candidates = ["compile", "format", "types"]
   distance.nearest("compil", candidates, max_distance: 2)
   |> should.equal(Some("compile"))
 }
@@ -47,7 +47,7 @@ pub fn nearest_picks_closest_when_multiple_test() {
 }
 
 pub fn nearest_returns_none_when_too_far_test() {
-  let candidates = ["compile", "format", "artifacts"]
+  let candidates = ["compile", "format", "types"]
   distance.nearest("xyzzy", candidates, max_distance: 2)
   |> should.equal(None)
 }

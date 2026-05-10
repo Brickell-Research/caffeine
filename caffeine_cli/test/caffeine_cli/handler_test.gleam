@@ -97,13 +97,6 @@ pub fn format_exit_code_test() {
   |> should.be_error()
 }
 
-// ==== Artifacts Command ====
-// * ✅ artifacts returns Ok
-pub fn artifacts_exit_code_test() {
-  caffeine_cli.run(["artifacts", "--quiet"])
-  |> should.be_ok()
-}
-
 // ==== Types Command ====
 // * ✅ types returns Ok
 pub fn types_exit_code_test() {
