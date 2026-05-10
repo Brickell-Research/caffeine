@@ -15,7 +15,6 @@ import caffeine_lang/constants
 import caffeine_lang/errors
 import caffeine_lang/frontend/formatter
 import caffeine_lang/source_file.{SourceFile, VendorMeasurementSource}
-import caffeine_lang/standard_library/artifacts as stdlib_artifacts
 import caffeine_lang/types
 import filepath
 import gleam/bool
@@ -79,12 +78,6 @@ pub fn run_format(
 
   let log_level = log_level_from_quiet(quiet)
   format_command(path, check_only, log_level)
-}
-
-/// Run the artifacts command.
-@internal
-pub fn run_artifacts(quiet: Bool) -> Result(Nil, String) {
-  artifacts_catalog(log_level_from_quiet(quiet), color.detect_color_mode())
 }
 
 /// Run the types command.
@@ -376,22 +369,6 @@ fn write_file(path: String, content: String) -> Result(Nil, String) {
     <> path
     <> ")"
   })
-}
-
-fn artifacts_catalog(
-  log_level: LogLevel,
-  mode: color.ColorMode,
-) -> Result(Nil, String) {
-  compile_presenter.log(log_level, "Artifact Catalog")
-  compile_presenter.log(log_level, string.repeat("=", 16))
-  compile_presenter.log(log_level, "")
-
-  stdlib_artifacts.slo_params()
-  |> display.pretty_print_slo_params(mode)
-  |> compile_presenter.log(log_level, _)
-
-  compile_presenter.log(log_level, "")
-  Ok(Nil)
 }
 
 fn types_catalog(

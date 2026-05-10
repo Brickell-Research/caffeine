@@ -71,7 +71,7 @@ pub fn all() -> Dict(String, Explanation) {
         "An artifact reference whose template body is malformed.",
         "A standard-library artifact the linker doesn't recognize.",
       ],
-      fix: "Check the artifact name and argument list against `caffeine artifacts`. If you wrote a custom artifact reference, verify its template syntax.",
+      fix: "Check the artifact name and argument list in the offending fragment. If you wrote a custom artifact reference, verify its template syntax.",
       link: option.Some(docs_root <> "E301"),
     ),
 
@@ -125,7 +125,7 @@ pub fn all() -> Dict(String, Explanation) {
         "A `$`-prefixed reference without a matching parameter definition.",
         "Template argument count doesn't match the template's parameter list.",
       ],
-      fix: "Locate the template named in the error and verify its body is well-formed. Artifact templates live in the standard library — `caffeine artifacts` lists them.",
+      fix: "Locate the template named in the error and verify its body is well-formed.",
       link: option.Some(docs_root <> "E402"),
     ),
 
@@ -164,7 +164,7 @@ pub fn all() -> Dict(String, Explanation) {
         "Measurement uses a vendor Caffeine's current build doesn't support.",
         "Vendor name was normalized unexpectedly (check case and spelling).",
       ],
-      fix: "Check `caffeine artifacts` or the project's supported-vendor list. If the vendor should be supported, this is a compiler bug — please file it.",
+      fix: "Check the project's supported-vendor list. If the vendor should be supported, this is a compiler bug — please file it.",
       link: option.Some(docs_root <> "E500"),
     ),
 

@@ -72,15 +72,6 @@ pub fn commands() -> List(CommandSpec) {
       ],
     ),
     CommandSpec(
-      name: "artifacts",
-      summary: "List standard-library artifacts",
-      signature: "",
-      description: "Print the catalog of artifacts (e.g. SLO) provided by Caffeine's "
-        <> "standard library, including each artifact's parameters and types.",
-      flags: [FlagSpec("--quiet", "Suppress decorative output")],
-      examples: ["caffeine artifacts"],
-    ),
-    CommandSpec(
       name: "types",
       summary: "Show the type-system reference",
       signature: "",

@@ -217,7 +217,6 @@ fn dispatch(parsed: ParsedArgs) -> Result(Nil, String) {
       let check = get_bool_flag(parsed.flags, "check")
       handler.run_format(quiet, check, parsed.positional)
     }
-    "artifacts" -> handler.run_artifacts(quiet)
     "types" -> handler.run_types(quiet)
     "explain" -> handler.run_explain(parsed.positional)
     other -> Error(unknown_command_message(other))
