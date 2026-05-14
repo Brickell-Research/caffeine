@@ -2,9 +2,9 @@
 # You typically do not need to edit this file
 
 packages = [
-  { name = "caffeine_lang", version = "5.6.0", build_tools = ["gleam"], requirements = ["datadog_query", "gleam_stdlib", "terra_madre"], otp_app = "caffeine_lang", source = "hex", outer_checksum = "B948CAF4540685DF505E781B15E497477056A286DC74A0BBB1F32315F1B61273" },
+  { name = "caffeine_lang", version = "5.6.0", build_tools = ["gleam"], requirements = ["datadog_query", "gleam_stdlib", "terra_madre"], otp_app = "caffeine_lang", source = "hex", outer_checksum = "9C19C8EB462C87E655B22DA2D7D91A5371A15A2E844017B093FBA557C63B6049" },
   { name = "datadog_query", version = "2.0.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "datadog_query", source = "hex", outer_checksum = "1B3F0A45D549EE7F33091008C5667C624CBFB59E4EB90856F208B74A50096EA3" },
-  { name = "gleam_stdlib", version = "1.0.0", build_tools = ["gleam"], requirements = [], otp_app = "gleam_stdlib", source = "hex", outer_checksum = "960090C2FB391784BB34267B099DC9315CC1B1F6013E7415BC763CEF1905D7D3" },
+  { name = "gleam_stdlib", version = "1.0.1", build_tools = ["gleam"], requirements = [], otp_app = "gleam_stdlib", source = "hex", outer_checksum = "D268F930A1F09925D2E66E336FC9F31F8DC50DB190585711B965E49E874A23CD" },
   { name = "gleeunit", version = "1.10.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleeunit", source = "hex", outer_checksum = "254B697FE72EEAD7BF82E941723918E421317813AC49923EE76A18C788C61E72" },
   { name = "terra_madre", version = "0.0.6", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "terra_madre", source = "hex", outer_checksum = "48648BC2CB0750A724D741E7573D8D5A474DFB457D177DBFDB7A3462334DE2B0" },
 ]
