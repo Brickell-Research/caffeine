@@ -2,9 +2,6 @@
 // Routes "lsp" to the TypeScript LSP server, fast-paths --version to skip the
 // Gleam CLI import on probe-style invocations (CI, IDE update checks),
 // otherwise runs the Gleam-compiled CLI.
-//
-// Wrapped in an async IIFE because `bun build --compile --bytecode`
-// rejects top-level await in the entry module.
 
 import pkg from "./package.json" with { type: "json" };
 
@@ -17,13 +14,12 @@ if (args[0] !== "lsp" && args.some((a) => a === "--version" || a === "-v")) {
   process.exit(0);
 }
 
-(async () => {
-  if (args.includes("lsp")) {
-    await import("./lsp_server.ts");
-  } else {
-    const { main } = await import(
-      "./caffeine_cli/build/dev/javascript/caffeine_cli/caffeine_cli.mjs"
-    );
-    main();
-  }
-})();
+if (args.includes("lsp")) {
+  // Dynamic import keeps vscode-languageserver out of the CLI hot path;
+  // the LSP module installs stdin listeners that keep the process alive.
+  import("./lsp_server.ts");
+} else {
+  // Dynamic import keeps the Gleam CLI off the --version fast-path above.
+  import("./caffeine_cli/build/dev/javascript/caffeine_cli/caffeine_cli.mjs")
+    .then(({ main }) => main());
+}

@@ -81,7 +81,10 @@ jobs:
           # --minify: strip whitespace + dead code + constant fold
           # --bytecode: pre-compile to JSC bytecode (~1.8x faster CLI cold-start,
           #   verified locally on Bun 1.3.14; +~7% binary size).
+          # --no-compile-autoload-*: skip .env / bunfig.toml lookups at startup;
+          #   caffeine reads neither.
           bun build --compile --minify --bytecode \
+            --no-compile-autoload-dotenv --no-compile-autoload-bunfig \
             --target=${{ matrix.target.bun_target }} \
             --outfile "dist/caffeine-${VERSION}-${{ matrix.target.name }}${{ matrix.target.ext }}" \
             main.mjs
