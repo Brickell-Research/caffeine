@@ -135,7 +135,7 @@ fn find_item_start_loop(reversed: List(String), idx: Int) -> Int {
     [] -> -1
     [line, ..rest] -> {
       let trimmed = string.trim(line)
-      use <- bool.guard(is_item_line(line, trimmed), idx)
+      use <- bool.guard(position_utils.is_item_line(line, trimmed), idx)
       find_item_start_loop(rest, idx - 1)
     }
   }
@@ -176,7 +176,7 @@ fn find_section_start_loop(reversed: List(String), idx: Int) -> Int {
           || string.starts_with(trimmed, "Provides"),
         idx,
       )
-      use <- bool.guard(is_item_line(line, trimmed), -1)
+      use <- bool.guard(position_utils.is_item_line(line, trimmed), -1)
       find_section_start_loop(rest, idx - 1)
     }
   }
@@ -201,15 +201,4 @@ fn trimmed_start_col(lines: List(String), idx: Int) -> Int {
     [line, ..] -> string.length(line) - string.length(string.trim_start(line))
     [] -> 0
   }
-}
-
-/// Check whether a line is an item header. Matches both measurement items
-/// (`"name":` at column 0) and expect items (`* "name":` indented).
-/// Uses the raw line to check indent so quoted field names at deeper
-/// indentation are not mistaken for items.
-fn is_item_line(raw_line: String, trimmed: String) -> Bool {
-  // Expect items: `* "name"` at any indent
-  string.starts_with(trimmed, "* \"")
-  // Measurement items: `"name"` at column 0 (no indentation)
-  || string.starts_with(raw_line, "\"")
 }

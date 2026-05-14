@@ -3,6 +3,14 @@ import gleam/bool
 import gleam/list
 import gleam/string
 
+/// Check whether a line is an item header. Matches both measurement items
+/// (`"name":` at column 0) and expect items (`* "name":` indented).
+/// Uses the raw line to check indent so quoted field names at deeper
+/// indentation are not mistaken for items.
+pub fn is_item_line(raw_line: String, trimmed: String) -> Bool {
+  string.starts_with(trimmed, "* \"") || string.starts_with(raw_line, "\"")
+}
+
 /// Find the 0-indexed line and column of the first whole-word occurrence
 /// of a name in source, or Error(Nil) if not found.
 pub fn find_name_position(
@@ -22,18 +30,6 @@ pub fn find_name_position_in_lines(
   name: String,
 ) -> Result(#(Int, Int), Nil) {
   find_in_lines(lines, name, 0)
-}
-
-/// Find the 0-indexed line and column of the first whole-word occurrence
-/// of a name, searching only from `start_line` onward. Returns Error(Nil)
-/// if not found.
-pub fn find_name_position_after_line(
-  content: String,
-  name: String,
-  start_line: Int,
-) -> Result(#(Int, Int), Nil) {
-  let lines = string.split(content, "\n") |> list.drop(start_line)
-  find_in_lines(lines, name, start_line)
 }
 
 /// Find the first whole-word occurrence of `name` starting from `from_line`

@@ -11,6 +11,7 @@ import gleam/string
 
 /// Edit distance between two strings (insertions, deletions,
 /// substitutions count as 1 each).
+@internal
 pub fn levenshtein(a: String, b: String) -> Int {
   do_levenshtein(string.to_graphemes(a), string.to_graphemes(b))
 }

@@ -9,6 +9,7 @@ import caffeine_lsp/lsp_types.{
   CikClass, CikField, CikKeyword, CikModule, CikVariable,
 }
 import caffeine_lsp/measurement_utils
+import caffeine_lsp/position_utils
 import gleam/bool
 import gleam/dict
 import gleam/list
@@ -172,7 +173,7 @@ fn find_enclosing_item_loop(lines: List(String)) -> option.Option(String) {
     [] -> option.None
     [line_text, ..rest] -> {
       let trimmed = string.trim(line_text)
-      case is_item_line(line_text, trimmed) {
+      case position_utils.is_item_line(line_text, trimmed) {
         True -> extract_item_name(trimmed)
         False -> find_enclosing_item_loop(rest)
       }
@@ -368,21 +369,10 @@ fn is_in_requires_loop(lines: List(String)) -> Bool {
       let trimmed = string.trim(line_text)
       use <- bool.guard(string.starts_with(trimmed, "Requires"), True)
       use <- bool.guard(string.starts_with(trimmed, "Provides"), False)
-      use <- bool.guard(is_item_line(line_text, trimmed), False)
+      use <- bool.guard(position_utils.is_item_line(line_text, trimmed), False)
       is_in_requires_loop(rest)
     }
   }
-}
-
-/// Check whether a line is an item header. Matches both measurement items
-/// (`"name":` at column 0) and expect items (`* "name":` indented).
-/// Uses the raw line to check indent so quoted field names at deeper
-/// indentation are not mistaken for items.
-fn is_item_line(raw_line: String, trimmed: String) -> Bool {
-  // Expect items: `* "name"` at any indent
-  string.starts_with(trimmed, "* \"")
-  // Measurement items: `"name"` at column 0 (no indentation)
-  || string.starts_with(raw_line, "\"")
 }
 
 /// Get existing provides field names for expects items.

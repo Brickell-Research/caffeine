@@ -145,7 +145,8 @@ fn is_ci() -> Bool {
 
 // --- Helpers ---
 
-fn env_truthy(name: String) -> Bool {
+/// True iff env var `name` is set to a non-empty value other than "0"/"false".
+pub fn env_truthy(name: String) -> Bool {
   case envoy.get(name) {
     Ok(v) -> v != "" && v != "false" && v != "0"
     Error(_) -> False
