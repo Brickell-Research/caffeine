@@ -129,8 +129,16 @@ fn extract_dependency_ref_with_range_on_line(
   line_text: String,
   character: Int,
 ) -> Option(#(String, Int)) {
-  // Relations strings always appear inside list brackets
-  use <- bool.guard(!string.contains(line_text, "["), option.None)
+  // Dependency strings appear either inside a `hard|soft dependency on "X"`
+  // line under `Assumes:` or (rarely) inside a list literal.
+  let trimmed = string.trim(line_text)
+  let looks_like_dep_line =
+    string.starts_with(trimmed, "hard dependency on")
+    || string.starts_with(trimmed, "soft dependency on")
+  use <- bool.guard(
+    !looks_like_dep_line && !string.contains(line_text, "["),
+    option.None,
+  )
   let parts = string.split(line_text, "\"")
   scan_string_parts(parts, 0, 0, character)
 }

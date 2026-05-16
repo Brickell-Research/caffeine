@@ -542,8 +542,8 @@ pub fn definition_extendable_test() {
   Guarantees 99.9% over 30d window as measured by \"api\" with: {
     status: true
   }"
-  // Hover on _defaults in extends list (line 3)
-  case definition.get_definition(source, 3, 25) {
+  // Hover on `_defaults` in the extends list (line 2, inside [_defaults]).
+  case definition.get_definition(source, 2, 23) {
     option.Some(#(line, _col, _len)) -> {
       // Should point to line 0 where _defaults is defined
       line |> should.equal(0)
@@ -602,8 +602,8 @@ pub fn measurement_ref_on_name_test() {
   Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
     status: true
   }"
-  // Cursor on 'a' of api_availability (col 26)
-  definition.get_measurement_ref_at_position(source, 0, 26)
+  // Cursor on first 'a' of api_availability on the Guarantees line.
+  definition.get_measurement_ref_at_position(source, 1, 51)
   |> should.equal(option.Some("api_availability"))
 }
 
@@ -613,8 +613,8 @@ pub fn measurement_ref_middle_of_name_test() {
   Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
     status: true
   }"
-  // Cursor on '_' between api and availability (col 29)
-  definition.get_measurement_ref_at_position(source, 0, 29)
+  // Cursor on '_' between api and availability.
+  definition.get_measurement_ref_at_position(source, 1, 54)
   |> should.equal(option.Some("api_availability"))
 }
 
@@ -624,8 +624,8 @@ pub fn measurement_ref_last_char_test() {
   Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
     status: true
   }"
-  // Cursor on last 'y' of api_availability (col 41)
-  definition.get_measurement_ref_at_position(source, 0, 41)
+  // Cursor on last 'y' of api_availability.
+  definition.get_measurement_ref_at_position(source, 1, 66)
   |> should.equal(option.Some("api_availability"))
 }
 
@@ -635,8 +635,8 @@ pub fn measurement_ref_on_keyword_returns_none_test() {
   Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
     status: true
   }"
-  // Cursor on "Expectations" (col 5)
-  definition.get_measurement_ref_at_position(source, 0, 5)
+  // Cursor on the `Guarantees` keyword itself.
+  definition.get_measurement_ref_at_position(source, 1, 5)
   |> should.equal(option.None)
 }
 
@@ -646,8 +646,8 @@ pub fn measurement_ref_on_for_returns_none_test() {
   Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
     status: true
   }"
-  // Cursor on "measured" (col 14)
-  definition.get_measurement_ref_at_position(source, 0, 14)
+  // Cursor on the `measured` keyword (still part of `as measured by`).
+  definition.get_measurement_ref_at_position(source, 1, 38)
   |> should.equal(option.None)
 }
 
@@ -657,8 +657,8 @@ pub fn measurement_ref_on_quote_returns_none_test() {
   Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
     status: true
   }"
-  // Cursor on opening quote (col 25)
-  definition.get_measurement_ref_at_position(source, 0, 25)
+  // Cursor on the opening quote of "api_availability".
+  definition.get_measurement_ref_at_position(source, 1, 50)
   |> should.equal(option.None)
 }
 
@@ -668,8 +668,8 @@ pub fn measurement_ref_past_closing_quote_returns_none_test() {
   Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
     status: true
   }"
-  // Cursor on closing quote (col 42)
-  definition.get_measurement_ref_at_position(source, 0, 42)
+  // Cursor past the closing quote of "api_availability".
+  definition.get_measurement_ref_at_position(source, 1, 68)
   |> should.equal(option.None)
 }
 
@@ -679,8 +679,8 @@ pub fn measurement_ref_on_item_line_returns_none_test() {
   Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
     status: true
   }"
-  // Cursor on item line (line 1)
-  definition.get_measurement_ref_at_position(source, 1, 7)
+  // Cursor on the item name line (no `as measured by` clause here).
+  definition.get_measurement_ref_at_position(source, 0, 4)
   |> should.equal(option.None)
 }
 
@@ -692,8 +692,8 @@ pub fn measurement_ref_multiple_blocks_test() {
   Guarantees 99.9% over 30d window as measured by \"latency\" with: {
     threshold_ms: 500
   }"
-  // Cursor on "latency" in second block (line 4, col 26)
-  definition.get_measurement_ref_at_position(source, 4, 26)
+  // Cursor on "latency" in the second expectation's Guarantees clause.
+  definition.get_measurement_ref_at_position(source, 3, 53)
   |> should.equal(option.Some("latency"))
 }
 
@@ -722,8 +722,8 @@ pub fn relation_ref_on_valid_path_test() {
   Assumes:
     hard dependency on \"org.team.svc.dep\"
   Guarantees 99.9% over 30d window as measured by \"bp\" with: {}"
-  // Line 2, cursor on 'o' of org.team.svc.dep (col 36)
-  definition.get_relation_ref_at_position(source, 2, 36)
+  // Cursor on 'o' of org.team.svc.dep (inside the quoted target).
+  definition.get_relation_ref_at_position(source, 2, 24)
   |> should.equal(option.Some("org.team.svc.dep"))
 }
 
@@ -733,8 +733,8 @@ pub fn relation_ref_middle_of_path_test() {
   Assumes:
     hard dependency on \"org.team.svc.dep\"
   Guarantees 99.9% over 30d window as measured by \"bp\" with: {}"
-  // Line 2, cursor on 't' of team (col 40)
-  definition.get_relation_ref_at_position(source, 2, 40)
+  // Cursor on 't' of `team`.
+  definition.get_relation_ref_at_position(source, 2, 28)
   |> should.equal(option.Some("org.team.svc.dep"))
 }
 
@@ -744,8 +744,8 @@ pub fn relation_ref_outside_quotes_returns_none_test() {
   Assumes:
     hard dependency on \"org.team.svc.dep\"
   Guarantees 99.9% over 30d window as measured by \"bp\" with: {}"
-  // Line 2, cursor on '[' (col 34) — outside quotes
-  definition.get_relation_ref_at_position(source, 2, 34)
+  // Cursor on the space before the opening quote — outside the target.
+  definition.get_relation_ref_at_position(source, 2, 22)
   |> should.equal(option.None)
 }
 
@@ -1122,8 +1122,8 @@ pub fn references_expects_measurement_name_test() {
   Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
     status: true
   }"
-  // Cursor on "api_availability" (line 0, col 26)
-  let refs = references.get_references(source, 0, 26)
+  // Cursor on "api_availability" inside the `as measured by "..."` clause.
+  let refs = references.get_references(source, 1, 51)
   { list.length(refs) >= 1 }
   |> should.be_true()
 }
@@ -1355,7 +1355,8 @@ pub fn hover_expect_item_test() {
   Guarantees 99.9% over 30d window as measured by \"api\" with: {
     status: true
   }"
-  case hover.get_hover(source, 1, 7, []) {
+  // Hover on the item name on line 0.
+  case hover.get_hover(source, 0, 3, []) {
     option.Some(md) -> {
       { string.contains(md, "checkout") } |> should.be_true()
       { string.contains(md, "Expectation item") } |> should.be_true()
@@ -1795,7 +1796,8 @@ pub fn type_hierarchy_expect_item_test() {
   Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
     status: true
   }"
-  let items = type_hierarchy.prepare_type_hierarchy(source, 1, 7)
+  // Cursor on the item name `checkout` on line 0.
+  let items = type_hierarchy.prepare_type_hierarchy(source, 0, 3)
   case items {
     [item] -> {
       item.name |> should.equal("checkout")
@@ -1848,7 +1850,8 @@ pub fn type_hierarchy_multiple_expects_blocks_test() {
   Guarantees 99.9% over 30d window as measured by \"bp_two\" with: {
     active: false
   }"
-  let items = type_hierarchy.prepare_type_hierarchy(source, 5, 7)
+  // Cursor on `item_b` (line 4, col 3 inside the quoted name).
+  let items = type_hierarchy.prepare_type_hierarchy(source, 4, 3)
   case items {
     [item] -> {
       item.name |> should.equal("item_b")
@@ -1869,13 +1872,16 @@ pub fn type_hierarchy_multiple_expects_blocks_test() {
 // * does not trigger after closing quote
 
 pub fn measurement_header_completion_suggests_names_test() {
-  let source = "Expectations measured by \""
-  // Cursor right after the opening quote (line 0, col 26)
+  // Typing the measurement name inside the `as measured by "..."` clause
+  // should suggest workspace measurement names.
+  let source =
+    "\"checkout\":\n  Guarantees 99.9% over 30d window as measured by \""
+  // Cursor sits one past the opening quote on the Guarantees line.
   let items =
     completion.get_completions(
       source,
-      0,
-      26,
+      1,
+      51,
       ["api_availability", "latency_slo"],
       [],
     )
@@ -1885,13 +1891,14 @@ pub fn measurement_header_completion_suggests_names_test() {
 }
 
 pub fn measurement_header_completion_filters_by_prefix_test() {
-  let source = "Expectations measured by \"api"
-  // Cursor after "api" (line 0, col 29)
+  let source =
+    "\"checkout\":\n  Guarantees 99.9% over 30d window as measured by \"api"
+  // Cursor right after the partial "api" on the Guarantees line.
   let items =
     completion.get_completions(
       source,
-      0,
-      29,
+      1,
+      54,
       ["api_availability", "latency_slo"],
       [],
     )
@@ -1901,8 +1908,9 @@ pub fn measurement_header_completion_filters_by_prefix_test() {
 }
 
 pub fn measurement_header_completion_empty_without_names_test() {
-  let source = "Expectations measured by \""
-  let items = completion.get_completions(source, 0, 26, [], [])
+  let source =
+    "\"checkout\":\n  Guarantees 99.9% over 30d window as measured by \""
+  let items = completion.get_completions(source, 1, 51, [], [])
   items |> should.equal([])
 }
 
@@ -1927,8 +1935,7 @@ pub fn compile_validated_measurements_valid_test() {
   Requires { env: String }
   Provides {
     indicators: { good: \"query_good\", total: \"query_total\" },
-    evaluation: \"good / total\",
-      threshold: 99.9%
+    evaluation: \"good / total\"
     }
 "
   case linker_diagnostics.compile_validated_measurements(source) {
@@ -1945,20 +1952,17 @@ pub fn compile_validated_measurements_invalid_test() {
 }
 
 pub fn compile_validated_measurements_expects_file_test() {
-  // An expects-format file now parses as an empty measurements file via error
-  // recovery (the measurements parser skips unrecognized tokens and finds no items).
+  // Under the envelope grammar, an expects file starts with `"name":` just like
+  // a measurements file, so the measurement parser advances past the name and
+  // then fails at the body (it expects `Provides`, sees `Guarantees`).
+  // `compile_validated_measurements` propagates that as `Error(Nil)`.
   let source =
     "\"checkout\":
   Guarantees 99.9% over 30d window as measured by \"my_slo\" with: {
     env: \"prod\"
   }"
-  case linker_diagnostics.compile_validated_measurements(source) {
-    Ok(measurements) -> {
-      // Empty list — no measurement items found
-      measurements |> should.equal([])
-    }
-    Error(_) -> should.fail()
-  }
+  linker_diagnostics.compile_validated_measurements(source)
+  |> should.be_error
 }
 
 // ==== get_linker_diagnostics ====
@@ -1976,8 +1980,7 @@ pub fn linker_diagnostics_all_correct_test() {
   Requires { env: String }
   Provides {
     indicators: { good: \"query_good\", total: \"query_total\" },
-    evaluation: \"good / total\",
-      threshold: 99.9%
+    evaluation: \"good / total\"
     }
 "
   let assert Ok(measurements) =
@@ -1998,8 +2001,7 @@ pub fn linker_diagnostics_missing_required_field_test() {
   Requires { env: String, status: Boolean }
   Provides {
     indicators: { good: \"query_good\", total: \"query_total\" },
-    evaluation: \"good / total\",
-      threshold: 99.9%
+    evaluation: \"good / total\"
     }
 "
   let assert Ok(measurements) =
@@ -2027,8 +2029,7 @@ pub fn linker_diagnostics_unknown_field_test() {
   Requires { env: String }
   Provides {
     indicators: { good: \"query_good\", total: \"query_total\" },
-    evaluation: \"good / total\",
-      threshold: 99.9%
+    evaluation: \"good / total\"
     }
 "
   let assert Ok(measurements) =
@@ -2054,7 +2055,7 @@ pub fn linker_diagnostics_unknown_field_test() {
 pub fn linker_diagnostics_type_mismatch_test() {
   let bp_source =
     "\"my_slo\":
-  Requires { env: String }
+  Requires { env: String, status: Boolean }
   Provides {
     indicators: { good: \"query_good\", total: \"query_total\" },
     evaluation: \"good / total\"
@@ -2063,18 +2064,22 @@ pub fn linker_diagnostics_type_mismatch_test() {
   let assert Ok(measurements) =
     linker_diagnostics.compile_validated_measurements(bp_source)
 
-  // Providing an integer for 'threshold' which expects Percentage (float)
+  // Providing an Integer for `status` which expects Boolean.
+  // (Threshold/window are now structural Guarantees clauses, so wrong-typed
+  //  values for them aren't representable in the grammar; type mismatch is
+  //  only reachable on user-supplied `with: {...}` args.)
   let ex_source =
     "\"checkout\":
   Guarantees 99% over 30d window as measured by \"my_slo\" with: {
-    env: \"prod\"
+    env: \"prod\",
+    status: 1
   }"
   let diags = linker_diagnostics.get_linker_diagnostics(ex_source, measurements)
   let type_diags =
     list.filter(diags, fn(d) { d.code == diagnostics.TypeMismatch })
   case type_diags {
     [diag] -> {
-      string.contains(diag.message, "threshold") |> should.be_true()
+      string.contains(diag.message, "status") |> should.be_true()
     }
     _ -> should.fail()
   }
@@ -2086,8 +2091,7 @@ pub fn linker_diagnostics_optional_defaulted_omitted_test() {
   Requires { env: String }
   Provides {
     indicators: { good: \"query_good\", total: \"query_total\" },
-    evaluation: \"good / total\",
-      threshold: 99.9%
+    evaluation: \"good / total\"
     }
 "
   let assert Ok(measurements) =
@@ -2109,8 +2113,7 @@ pub fn linker_diagnostics_unknown_measurement_ref_test() {
   Requires { env: String }
   Provides {
     indicators: { good: \"q\", total: \"q\" },
-    evaluation: \"good / total\",
-      threshold: 99.9%
+    evaluation: \"good / total\"
     }
 "
   let assert Ok(measurements) =
@@ -2151,8 +2154,7 @@ pub fn measurement_aware_completion_suggests_params_test() {
   Requires { env: String, status: Boolean }
   Provides {
     indicators: { good: \"query_good\", total: \"query_total\" },
-    evaluation: \"good / total\",
-      threshold: 99.9%
+    evaluation: \"good / total\"
     }
 "
   let assert Ok(measurements) =
@@ -2161,10 +2163,11 @@ pub fn measurement_aware_completion_suggests_params_test() {
   let ex_source =
     "\"checkout\":
   Guarantees 99.9% over 30d window as measured by \"my_slo\" with: {
-    env: \"prod\"
+    env: \"prod\",
+
   }"
-  // Line 4 is the empty line inside Provides
-  let items = completion.get_completions(ex_source, 4, 6, [], measurements)
+  // Cursor on the empty line inside the `with: { ... }` block.
+  let items = completion.get_completions(ex_source, 3, 4, [], measurements)
   let labels = list.map(items, fn(i) { i.label })
   // status should be suggested (remaining param from measurement Requires)
   list.contains(labels, "status") |> should.be_true()
@@ -2195,8 +2198,7 @@ pub fn measurement_aware_completion_unknown_measurement_test() {
   Requires { env: String }
   Provides {
     indicators: { good: \"query_good\", total: \"query_total\" },
-    evaluation: \"good / total\",
-      threshold: 99.9%
+    evaluation: \"good / total\"
     }
 "
   let assert Ok(measurements) =
@@ -2233,8 +2235,7 @@ pub fn signature_help_in_provides_test() {
   Requires { env: String, status: Boolean }
   Provides {
     indicators: { good: \"query_good\", total: \"query_total\" },
-    evaluation: \"good / total\",
-      threshold: 99.9%
+    evaluation: \"good / total\"
     }
 "
   let assert Ok(measurements) =
@@ -2264,8 +2265,7 @@ pub fn signature_help_active_parameter_test() {
   Requires { env: String, status: Boolean }
   Provides {
     indicators: { good: \"query_good\", total: \"query_total\" },
-    evaluation: \"good / total\",
-      threshold: 99.9%
+    evaluation: \"good / total\"
     }
 "
   let assert Ok(measurements) =
@@ -2274,11 +2274,11 @@ pub fn signature_help_active_parameter_test() {
   let ex_source =
     "\"checkout\":
   Guarantees 99.9% over 30d window as measured by \"my_slo\" with: {
-    env: \"prod\"
-      status: true
+    env: \"prod\",
+    status: true
   }"
-  // Cursor on the status line (line 4)
-  case signature_help.get_signature_help(ex_source, 4, 10, measurements) {
+  // Cursor on the `status:` line inside the with-args block.
+  case signature_help.get_signature_help(ex_source, 3, 10, measurements) {
     option.Some(sig) -> {
       // Active parameter should be >= 0 (matched to status)
       { sig.active_parameter >= 0 } |> should.be_true()
@@ -2319,8 +2319,7 @@ pub fn inlay_hints_shows_types_test() {
   Requires { env: String }
   Provides {
     indicators: { good: \"query_good\", total: \"query_total\" },
-    evaluation: \"good / total\",
-      threshold: 99.9%
+    evaluation: \"good / total\"
     }
 "
   let assert Ok(measurements) =
@@ -2356,8 +2355,7 @@ pub fn inlay_hints_no_match_no_hints_test() {
   Requires { env: String }
   Provides {
     indicators: { good: \"query_good\", total: \"query_total\" },
-    evaluation: \"good / total\",
-      threshold: 99.9%
+    evaluation: \"good / total\"
     }
 "
   let assert Ok(measurements) =
@@ -2379,8 +2377,7 @@ pub fn inlay_hints_respects_range_test() {
   Requires { env: String, status: Boolean }
   Provides {
     indicators: { good: \"query_good\", total: \"query_total\" },
-    evaluation: \"good / total\",
-      threshold: 99.9%
+    evaluation: \"good / total\"
     }
 "
   let assert Ok(measurements) =
@@ -2403,8 +2400,7 @@ pub fn inlay_hints_duplicate_field_names_test() {
   Requires { env: String }
   Provides {
     indicators: { good: \"query_good\", total: \"query_total\" },
-    evaluation: \"good / total\",
-      threshold: 99.9%
+    evaluation: \"good / total\"
     }
 "
   let assert Ok(measurements) =
@@ -2424,11 +2420,12 @@ pub fn inlay_hints_duplicate_field_names_test() {
   let hints = inlay_hints.get_inlay_hints(ex_source, 0, 20, measurements)
   // Should have exactly 2 hints (one per item's env field)
   list.length(hints) |> should.equal(2)
-  // First hint on line 3, second on line 7 — different lines
+  // First env is on line 2, second on line 7 — different lines so the
+  // duplicate-field-name deduplication doesn't collapse them.
   let lines = list.map(hints, fn(h) { h.line })
   case lines {
     [first, second] -> {
-      first |> should.equal(3)
+      first |> should.equal(2)
       second |> should.equal(7)
     }
     _ -> should.fail()
@@ -2479,8 +2476,7 @@ pub fn inlay_hints_shows_default_values_test() {
   Requires { env: Defaulted(String, \"production\") }
   Provides {
     indicators: { good: \"query_good\", total: \"query_total\" },
-    evaluation: \"good / total\",
-      threshold: 99.9%
+    evaluation: \"good / total\"
     }
 "
   let assert Ok(measurements) =
@@ -2659,8 +2655,7 @@ pub fn hover_expect_item_shows_measurement_requires_test() {
   Requires { env: String }
   Provides {
     indicators: { good: \"query_good\", total: \"query_total\" },
-    evaluation: \"good / total\",
-      threshold: 99.9%
+    evaluation: \"good / total\"
     }
 "
   let assert Ok(measurements) =
@@ -2670,7 +2665,8 @@ pub fn hover_expect_item_shows_measurement_requires_test() {
   Guarantees 99.9% over 30d window as measured by \"my_slo\" with: {
     env: \"prod\"
   }"
-  case hover.get_hover(source, 1, 7, measurements) {
+  // Hover on the item name `checkout` on line 0.
+  case hover.get_hover(source, 0, 3, measurements) {
     option.Some(markdown) -> {
       string.contains(markdown, "checkout") |> should.be_true()
       string.contains(markdown, "Measurement Requires") |> should.be_true()
@@ -2697,10 +2693,14 @@ pub fn field_completion_snippet_test() {
 "
   let assert Ok(measurements) =
     linker_diagnostics.compile_validated_measurements(bp_source)
+  // Multi-line `with: { ... }` block so the cursor can be inside.
   let source =
     "\"checkout\":
-  Guarantees 99.9% over 30d window as measured by \"my_slo\" with: {}"
-  let items = completion.get_completions(source, 3, 6, [], measurements)
+  Guarantees 99.9% over 30d window as measured by \"my_slo\" with: {
+
+  }"
+  // Cursor inside the empty with-args block on line 2.
+  let items = completion.get_completions(source, 2, 4, [], measurements)
   let env_items = list.filter(items, fn(i) { i.label == "env" })
   case env_items {
     [item] -> {
@@ -2867,12 +2867,12 @@ pub fn relation_ref_with_range_valid_test() {
   Assumes:
     hard dependency on \"org.team.svc.dep\"
   Guarantees 99.9% over 30d window as measured by \"bp\" with: {}"
-  // Line 2, cursor on 'o' of org.team.svc.dep
-  case definition.get_relation_ref_with_range_at_position(source, 2, 36) {
+  // Cursor on 'o' of org.team.svc.dep on the dependency line.
+  case definition.get_relation_ref_with_range_at_position(source, 2, 24) {
     option.Some(#(ref, start_col)) -> {
       ref |> should.equal("org.team.svc.dep")
-      // Start col should be the position of 'o' after the opening quote
-      { start_col >= 35 && start_col <= 37 } |> should.be_true()
+      // The 'o' of org sits one past the opening quote.
+      { start_col >= 23 && start_col <= 25 } |> should.be_true()
     }
     option.None -> should.fail()
   }
@@ -2884,8 +2884,8 @@ pub fn relation_ref_with_range_outside_quotes_test() {
   Assumes:
     hard dependency on \"org.team.svc.dep\"
   Guarantees 99.9% over 30d window as measured by \"bp\" with: {}"
-  // Line 2, cursor on '[' — outside quotes
-  definition.get_relation_ref_with_range_at_position(source, 2, 34)
+  // Cursor on the space before the opening quote — outside the target.
+  definition.get_relation_ref_with_range_at_position(source, 2, 22)
   |> should.equal(option.None)
 }
 
