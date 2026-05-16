@@ -719,9 +719,9 @@ pub fn measurement_ref_measurements_file_returns_none_test() {
 pub fn relation_ref_on_valid_path_test() {
   let source =
     "\"item\":
-  Guarantees 99.9% over 30d window as measured by \"bp\" with: {
-    relations: { hard: [\"org.team.svc.dep\"] }
-  }"
+  Assumes:
+    hard dependency on \"org.team.svc.dep\"
+  Guarantees 99.9% over 30d window as measured by \"bp\" with: {}"
   // Line 2, cursor on 'o' of org.team.svc.dep (col 36)
   definition.get_relation_ref_at_position(source, 2, 36)
   |> should.equal(option.Some("org.team.svc.dep"))
@@ -730,9 +730,9 @@ pub fn relation_ref_on_valid_path_test() {
 pub fn relation_ref_middle_of_path_test() {
   let source =
     "\"item\":
-  Guarantees 99.9% over 30d window as measured by \"bp\" with: {
-    relations: { hard: [\"org.team.svc.dep\"] }
-  }"
+  Assumes:
+    hard dependency on \"org.team.svc.dep\"
+  Guarantees 99.9% over 30d window as measured by \"bp\" with: {}"
   // Line 2, cursor on 't' of team (col 40)
   definition.get_relation_ref_at_position(source, 2, 40)
   |> should.equal(option.Some("org.team.svc.dep"))
@@ -741,9 +741,9 @@ pub fn relation_ref_middle_of_path_test() {
 pub fn relation_ref_outside_quotes_returns_none_test() {
   let source =
     "\"item\":
-  Guarantees 99.9% over 30d window as measured by \"bp\" with: {
-    relations: { hard: [\"org.team.svc.dep\"] }
-  }"
+  Assumes:
+    hard dependency on \"org.team.svc.dep\"
+  Guarantees 99.9% over 30d window as measured by \"bp\" with: {}"
   // Line 2, cursor on '[' (col 34) — outside quotes
   definition.get_relation_ref_at_position(source, 2, 34)
   |> should.equal(option.None)
@@ -1148,8 +1148,8 @@ pub fn get_measurement_name_at_expects_header_test() {
   Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
     status: true
   }"
-  // Cursor on "api_availability" (line 0, col 26)
-  references.get_measurement_name_at(source, 0, 26)
+  // Cursor on "api_availability" inside the `as measured by "..."` clause on line 1.
+  references.get_measurement_name_at(source, 1, 51)
   |> should.equal("api_availability")
 }
 
@@ -1184,7 +1184,7 @@ pub fn find_references_to_name_test() {
   }"
   let refs = references.find_references_to_name(source, "api_availability")
   refs
-  |> should.equal([#(0, 26, 16)])
+  |> should.equal([#(1, 51, 16)])
 }
 
 pub fn find_references_to_name_not_found_test() {
@@ -1497,9 +1497,9 @@ pub fn cross_file_empty_known_list_reports_all_test() {
 pub fn dependency_known_target_no_diagnostics_test() {
   let source =
     "\"item\":
-  Guarantees 99.9% over 30d window as measured by \"bp\" with: {
-    relations: { hard: [\"org.team.svc.dep\"] }
-  }"
+  Assumes:
+    hard dependency on \"org.team.svc.dep\"
+  Guarantees 99.9% over 30d window as measured by \"bp\" with: {}"
   diagnostics.get_cross_file_dependency_diagnostics(source, [
     "org.team.svc.dep",
   ])
@@ -1509,9 +1509,9 @@ pub fn dependency_known_target_no_diagnostics_test() {
 pub fn dependency_unknown_target_returns_diagnostic_test() {
   let source =
     "\"item\":
-  Guarantees 99.9% over 30d window as measured by \"bp\" with: {
-    relations: { hard: [\"org.team.svc.dep\"] }
-  }"
+  Assumes:
+    hard dependency on \"org.team.svc.dep\"
+  Guarantees 99.9% over 30d window as measured by \"bp\" with: {}"
   let diags = diagnostics.get_cross_file_dependency_diagnostics(source, [])
   case diags {
     [diag] -> {
@@ -1542,9 +1542,10 @@ pub fn dependency_no_relations_returns_empty_test() {
 pub fn dependency_multiple_mixed_test() {
   let source =
     "\"item\":
-  Guarantees 99.9% over 30d window as measured by \"bp\" with: {
-    relations: { hard: [\"known.t.s.dep\", \"unknown.t.s.dep\"] }
-  }"
+  Assumes:
+    hard dependency on \"known.t.s.dep\"
+    hard dependency on \"unknown.t.s.dep\"
+  Guarantees 99.9% over 30d window as measured by \"bp\" with: {}"
   let diags =
     diagnostics.get_cross_file_dependency_diagnostics(source, [
       "known.t.s.dep",
@@ -1561,9 +1562,10 @@ pub fn dependency_multiple_mixed_test() {
 pub fn dependency_duplicate_targets_single_diagnostic_test() {
   let source =
     "\"item\":
-  Guarantees 99.9% over 30d window as measured by \"bp\" with: {
-    relations: { hard: [\"org.t.s.dep\"], soft: [\"org.t.s.dep\"] }
-  }"
+  Assumes:
+    hard dependency on \"org.t.s.dep\"
+    soft dependency on \"org.t.s.dep\"
+  Guarantees 99.9% over 30d window as measured by \"bp\" with: {}"
   let diags = diagnostics.get_cross_file_dependency_diagnostics(source, [])
   case diags {
     [diag] -> {
@@ -1619,9 +1621,9 @@ pub fn all_diagnostics_unknown_measurement_test() {
 pub fn all_diagnostics_unknown_dependency_test() {
   let source =
     "\"item\":
-  Guarantees 99.9% over 30d window as measured by \"bp\" with: {
-    relations: { hard: [\"org.team.svc.dep\"] }
-  }"
+  Assumes:
+    hard dependency on \"org.team.svc.dep\"
+  Guarantees 99.9% over 30d window as measured by \"bp\" with: {}"
   let diags = diagnostics.get_all_diagnostics(source, ["bp"], [])
   let has_dep_not_found =
     list.any(diags, fn(d) {
@@ -1635,9 +1637,10 @@ pub fn all_diagnostics_combines_all_checks_test() {
   // Expects file with validation error (undefined extendable), unknown measurement, and unknown dep
   let source =
     "\"item\" extends [_nonexistent]:
+  Assumes:
+    hard dependency on \"org.t.s.dep\"
   Guarantees 99.9% over 30d window as measured by \"unknown_bp\" with: {
-    env: \"staging\",
-    relations: { hard: [\"org.t.s.dep\"] }
+    env: \"staging\"
   }"
   let diags = diagnostics.get_all_diagnostics(source, [], [])
   // Should have validation error (undefined extendable), measurement not found, and dependency not found
@@ -2861,9 +2864,9 @@ pub fn find_defined_symbol_positions_non_symbol_test() {
 pub fn relation_ref_with_range_valid_test() {
   let source =
     "\"item\":
-  Guarantees 99.9% over 30d window as measured by \"bp\" with: {
-    relations: { hard: [\"org.team.svc.dep\"] }
-  }"
+  Assumes:
+    hard dependency on \"org.team.svc.dep\"
+  Guarantees 99.9% over 30d window as measured by \"bp\" with: {}"
   // Line 2, cursor on 'o' of org.team.svc.dep
   case definition.get_relation_ref_with_range_at_position(source, 2, 36) {
     option.Some(#(ref, start_col)) -> {
@@ -2878,9 +2881,9 @@ pub fn relation_ref_with_range_valid_test() {
 pub fn relation_ref_with_range_outside_quotes_test() {
   let source =
     "\"item\":
-  Guarantees 99.9% over 30d window as measured by \"bp\" with: {
-    relations: { hard: [\"org.team.svc.dep\"] }
-  }"
+  Assumes:
+    hard dependency on \"org.team.svc.dep\"
+  Guarantees 99.9% over 30d window as measured by \"bp\" with: {}"
   // Line 2, cursor on '[' — outside quotes
   definition.get_relation_ref_with_range_at_position(source, 2, 34)
   |> should.equal(option.None)
