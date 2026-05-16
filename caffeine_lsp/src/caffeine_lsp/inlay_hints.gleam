@@ -44,9 +44,9 @@ pub fn get_inlay_hints(
   }
 }
 
-/// Generate hints for all expectation blocks in an expects file.
-/// Threads a `search_from` line cursor through all blocks and items so each
-/// lookup scans forward from the previous result rather than restarting at 0.
+/// Generate hints for all expectation items in an expects file.
+/// Threads a `search_from` line cursor through all items so each lookup scans
+/// forward from the previous result rather than restarting at 0.
 fn get_expects_hints(
   lines: List(String),
   file: ast.ExpectsFile(ast.Parsed),
@@ -55,25 +55,23 @@ fn get_expects_hints(
   measurement_index: Dict(String, Measurement(MeasurementValidated)),
 ) -> List(InlayHint) {
   let #(_, hints_rev) =
-    list.fold(file.blocks, #(0, []), fn(acc, block) {
-      case block.measurement {
+    list.fold(file.items, #(0, []), fn(acc, item) {
+      case item.guarantees.measured_by {
         option.None -> acc
-        option.Some(measurement_name) ->
-          case dict.get(measurement_index, measurement_name) {
+        option.Some(mb) ->
+          case dict.get(measurement_index, mb.measurement) {
             Error(_) -> acc
             Ok(measurement) -> {
               let remaining_params =
                 measurement_utils.compute_remaining_params(measurement)
-              list.fold(block.items, acc, fn(acc2, item) {
-                get_item_hints_acc(
-                  lines,
-                  item,
-                  remaining_params,
-                  start_line,
-                  end_line,
-                  acc2,
-                )
-              })
+              get_item_hints_acc(
+                lines,
+                item,
+                remaining_params,
+                start_line,
+                end_line,
+                acc,
+              )
             }
           }
       }
@@ -99,7 +97,11 @@ fn get_item_hints_acc(
       search_from,
       search_from,
     )
-  list.fold(item.provides.fields, #(item_start, hints), fn(acc2, field) {
+  let with_fields = case item.guarantees.measured_by {
+    option.Some(mb) -> mb.with_args.fields
+    option.None -> []
+  }
+  list.fold(with_fields, #(item_start, hints), fn(acc2, field) {
     let #(from, hints2) = acc2
     case dict.get(remaining_params, field.name) {
       Error(_) -> acc2

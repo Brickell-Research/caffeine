@@ -192,21 +192,20 @@ fn lookup_expect_item(
   file: ast.ExpectsFile(ast.Parsed),
   validated_measurements: List(Measurement(MeasurementValidated)),
 ) -> Option(String) {
-  // Find the item and its enclosing block (for measurement ref lookup).
-  let found =
-    list.find_map(file.blocks, fn(block) {
-      case list.find(block.items, fn(i) { i.name == word }) {
-        Ok(item) -> Ok(#(item, block.measurement))
-        Error(_) -> Error(Nil)
-      }
-    })
-  case found {
-    Ok(#(item, measurement_ref)) -> {
+  case list.find(file.items, fn(i) { i.name == word }) {
+    Ok(item) -> {
       let extends_info = case item.extends {
         [] -> ""
         exts -> "\n\nExtends: " <> string.join(exts, ", ")
       }
-      let prov_count = list.length(item.provides.fields)
+      let measurement_ref = case item.guarantees.measured_by {
+        option.Some(mb) -> option.Some(mb.measurement)
+        option.None -> option.None
+      }
+      let with_count = case item.guarantees.measured_by {
+        option.Some(mb) -> list.length(mb.with_args.fields)
+        option.None -> 0
+      }
       let requires_info = case measurement_ref {
         option.Some(ref) ->
           format_measurement_requires(ref, validated_measurements)
@@ -217,8 +216,8 @@ fn lookup_expect_item(
         <> item.name
         <> "** — Expectation item"
         <> extends_info
-        <> "\n\nProvides: "
-        <> int.to_string(prov_count)
+        <> "\n\nwith: "
+        <> int.to_string(with_count)
         <> " fields"
         <> requires_info,
       )
@@ -266,8 +265,11 @@ fn lookup_expect_field(
   file: ast.ExpectsFile(ast.Parsed),
 ) -> Option(String) {
   let all_fields =
-    list.flat_map(file.blocks, fn(b) {
-      list.flat_map(b.items, fn(item) { item.provides.fields })
+    list.flat_map(file.items, fn(item) {
+      case item.guarantees.measured_by {
+        option.Some(mb) -> mb.with_args.fields
+        option.None -> []
+      }
     })
   lookup_field_in_list(word, all_fields)
 }

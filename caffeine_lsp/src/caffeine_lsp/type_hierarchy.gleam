@@ -98,12 +98,13 @@ fn find_in_expects(
   lines: List(String),
   name: String,
 ) -> List(TypeHierarchyItem) {
-  file.blocks
-  |> list.flat_map(fn(block) {
-    block.items
-    |> list.filter_map(fn(item) {
-      match_expect_item(item, lines, name, block.measurement)
-    })
+  file.items
+  |> list.filter_map(fn(item) {
+    let measurement = case item.guarantees.measured_by {
+      option.Some(mb) -> option.Some(mb.measurement)
+      option.None -> option.None
+    }
+    match_expect_item(item, lines, name, measurement)
   })
 }
 

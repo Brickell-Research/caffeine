@@ -86,10 +86,20 @@ fn classify_token(
   next: Result(Token, Nil),
 ) -> Result(#(Int, Int), Nil) {
   case tok {
-    // Keywords
-    token.KeywordExpectations -> Ok(#(stt_keyword, 12))
+    // Envelope + envelope-clause keywords
+    token.KeywordAssumes -> Ok(#(stt_keyword, 7))
+    token.KeywordGuarantees -> Ok(#(stt_keyword, 10))
+    token.KeywordOver -> Ok(#(stt_keyword, 4))
+    token.KeywordWindow -> Ok(#(stt_keyword, 6))
+    token.KeywordAs -> Ok(#(stt_keyword, 2))
     token.KeywordMeasured -> Ok(#(stt_keyword, 8))
     token.KeywordBy -> Ok(#(stt_keyword, 2))
+    token.KeywordWith -> Ok(#(stt_keyword, 4))
+    token.KeywordBelow -> Ok(#(stt_keyword, 5))
+    token.KeywordHard -> Ok(#(stt_keyword, 4))
+    token.KeywordSoft -> Ok(#(stt_keyword, 4))
+    token.KeywordDependency -> Ok(#(stt_keyword, 10))
+    token.KeywordOn -> Ok(#(stt_keyword, 2))
     token.KeywordExtends -> Ok(#(stt_keyword, 7))
     token.KeywordRequires -> Ok(#(stt_keyword, 8))
     token.KeywordProvides -> Ok(#(stt_keyword, 8))
@@ -125,6 +135,12 @@ fn classify_token(
     // Percentage literal — +1 for % suffix
     token.LiteralPercentage(f) ->
       Ok(#(stt_number, string.length(float.to_string(f)) + 1))
+    // Duration literal — amount in number style, unit suffix in keyword style
+    token.LiteralDuration(amount, unit) ->
+      Ok(#(
+        stt_number,
+        string.length(float.to_string(amount)) + string.length(unit),
+      ))
 
     // Refinement variable
     token.KeywordX -> Ok(#(stt_variable, 1))

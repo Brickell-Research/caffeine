@@ -104,10 +104,11 @@ fn is_type_context(before: String) -> Bool {
   string.ends_with(string.trim(before), ":") || string.ends_with(before, "(")
 }
 
-/// Detect if cursor is inside a measurement header reference, e.g.
-/// `Expectations measured by "api` → Some("api"), `Expectations measured by "` → Some("").
+/// Detect if cursor is inside an `as measured by` reference on the current
+/// expectation, e.g. `as measured by "api` → Some("api"), `as measured by "` →
+/// Some("").
 fn get_measurement_header_prefix(before: String) -> option.Option(String) {
-  case string.split_once(before, "Expectations measured by \"") {
+  case string.split_once(before, "as measured by \"") {
     Ok(#(_, after_quote)) ->
       // Only match if the closing quote hasn't been typed yet
       case string.contains(after_quote, "\"") {
@@ -181,8 +182,10 @@ fn find_enclosing_item_loop(lines: List(String)) -> option.Option(String) {
   }
 }
 
-/// Walk backwards from the cursor line to find the enclosing
-/// `Expectations measured by "name"` header and return the measurement ref.
+/// Walk backwards from the cursor line to find the enclosing expectation's
+/// `as measured by "name"` clause and return the measurement ref. Stops at
+/// the start of the previous item so an unmeasured expectation doesn't pick
+/// up the next expectation's measurement.
 @internal
 pub fn find_enclosing_measurement_ref(
   lines: List(String),
@@ -199,7 +202,7 @@ fn find_enclosing_measurement_ref_loop(
     [] -> option.None
     [line_text, ..rest] -> {
       let trimmed = string.trim(line_text)
-      case string.split_once(trimmed, "Expectations measured by \"") {
+      case string.split_once(trimmed, "as measured by \"") {
         Ok(#(_, after)) ->
           case string.split_once(after, "\"") {
             Ok(#(name, _)) -> option.Some(name)
@@ -270,14 +273,14 @@ fn expects_field_context(
   validated_measurements: List(Measurement(MeasurementValidated)),
 ) -> option.Option(List(#(String, String))) {
   let item =
-    list.flat_map(file.blocks, fn(b) { b.items })
+    file.items
     |> list.find(fn(i) { i.name == item_name })
   case item {
     Error(_) -> option.None
     Ok(item) -> {
       let extended_fields =
         collect_extended_fields(item.extends, file.extendables)
-      let existing = existing_provides_fields(item.provides)
+      let existing = existing_with_args_fields(item)
       let existing_set = set.from_list(existing)
 
       // Add fields from the measurement's Requires (remaining params).
@@ -375,9 +378,12 @@ fn is_in_requires_loop(lines: List(String)) -> Bool {
   }
 }
 
-/// Get existing provides field names for expects items.
-fn existing_provides_fields(provides: ast.Struct) -> List(String) {
-  list.map(provides.fields, fn(f) { f.name })
+/// Get existing `with: {...}` field names for an expect item.
+fn existing_with_args_fields(item: ast.ExpectItem) -> List(String) {
+  case item.guarantees.measured_by {
+    option.Some(mb) -> list.map(mb.with_args.fields, fn(f) { f.name })
+    option.None -> []
+  }
 }
 
 // --- Completion generators ---

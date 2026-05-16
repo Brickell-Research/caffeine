@@ -4,9 +4,7 @@ import caffeine_lang/frontend/ast.{
 }
 import caffeine_lang/types
 import caffeine_lsp/file_utils
-import caffeine_lsp/lsp_types.{
-  SkClass, SkModule, SkProperty, SkTypeParameter, SkVariable,
-}
+import caffeine_lsp/lsp_types.{SkClass, SkProperty, SkTypeParameter, SkVariable}
 import caffeine_lsp/position_utils
 import gleam/list
 import gleam/option
@@ -55,19 +53,9 @@ fn expects_file_symbols(
 ) -> List(DocumentSymbol) {
   let ext_syms =
     list.map(file.extendables, fn(e) { extendable_symbol(e, lines) })
-  let #(block_syms, _) =
-    list.fold(file.blocks, #([], 0), fn(acc, b) {
-      let #(syms, search_from) = acc
-      let name = case b.measurement {
-        option.Some(m) -> "Expectations measured by " <> m
-        option.None -> "Unmeasured Expectations"
-      }
-      let children =
-        list.map(b.items, fn(item) { expect_item_symbol(item, lines) })
-      let sym = block_symbol("Expectations", lines, name, children, search_from)
-      #([sym, ..syms], sym.line + 1)
-    })
-  list.flatten([ext_syms, list.reverse(block_syms)])
+  let item_syms =
+    list.map(file.items, fn(item) { expect_item_symbol(item, lines) })
+  list.flatten([ext_syms, item_syms])
 }
 
 fn type_alias_symbol(ta: TypeAlias, lines: List(String)) -> DocumentSymbol {
@@ -102,30 +90,6 @@ fn extendable_symbol(ext: Extendable, lines: List(String)) -> DocumentSymbol {
   )
 }
 
-fn block_symbol(
-  keyword: String,
-  lines: List(String),
-  display_name: String,
-  children: List(DocumentSymbol),
-  search_from: Int,
-) -> DocumentSymbol {
-  // Search for the block keyword starting after previous blocks.
-  let search_lines = list.drop(lines, search_from)
-  let #(line, col) =
-    position_utils.find_name_position_in_lines(search_lines, keyword)
-    |> result.map(fn(pos) { #(pos.0 + search_from, pos.1) })
-    |> result.unwrap(#(0, 0))
-  DocumentSymbol(
-    display_name,
-    "",
-    lsp_types.symbol_kind_to_int(SkModule),
-    line,
-    col,
-    string.length(display_name),
-    children,
-  )
-}
-
 fn measurement_item_symbol(
   item: MeasurementItem,
   lines: List(String),
@@ -153,8 +117,11 @@ fn expect_item_symbol(item: ExpectItem, lines: List(String)) -> DocumentSymbol {
   let #(line, col) =
     position_utils.find_name_position_in_lines(lines, item.name)
     |> result.unwrap(#(0, 0))
-  let children =
-    list.map(item.provides.fields, fn(f) { field_symbol(f, lines) })
+  let with_fields = case item.guarantees.measured_by {
+    option.Some(mb) -> mb.with_args.fields
+    option.None -> []
+  }
+  let children = list.map(with_fields, fn(f) { field_symbol(f, lines) })
   DocumentSymbol(
     item.name,
     "",

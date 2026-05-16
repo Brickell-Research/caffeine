@@ -206,10 +206,10 @@ pub fn invalid_extendable_kind_expects_diagnostic_test() {
   let source =
     "_base (Requires): { env: String }
 
-Expectations measured by \"api_availability\"
-  * \"checkout\":
-    Provides { status: true }
-"
+\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
+    status: true
+  }"
   let diags = diagnostics.get_diagnostics(source)
   case diags {
     [diag] -> {
@@ -224,10 +224,10 @@ Expectations measured by \"api_availability\"
 pub fn valid_expects_no_diagnostics_test() {
   // An expects file without extendables is correctly detected and validated.
   let source =
-    "Expectations measured by \"api_availability\"
-  * \"checkout\":
-    Provides { status: true }
-"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
+    status: true
+  }"
   diagnostics.get_diagnostics(source)
   |> should.equal([])
 }
@@ -291,7 +291,12 @@ pub fn hover_empty_space_returns_none_test() {
 
 pub fn hover_extendable_test() {
   let source =
-    "_defaults (Provides): { env: \"production\" }\n\nExpectations measured by \"api\"\n  * \"checkout\" extends [_defaults]:\n    Provides { status: true }\n"
+    "_defaults (Provides): { env: \"production\" }
+
+\"checkout\" extends [_defaults]:
+  Guarantees 99.9% over 30d window as measured by \"api\" with: {
+    status: true
+  }"
   case hover.get_hover(source, 0, 2, []) {
     option.Some(markdown) -> {
       { string.contains(markdown, "_defaults") } |> should.be_true()
@@ -390,7 +395,10 @@ pub fn document_symbols_type_alias_test() {
 
 pub fn document_symbols_expects_test() {
   let source =
-    "Expectations measured by \"api_availability\"\n  * \"checkout\":\n    Provides { status: true }\n"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
+    status: true
+  }"
   let symbols = document_symbols.get_symbols(source)
   { symbols != [] } |> should.be_true()
 }
@@ -481,7 +489,10 @@ pub fn semantic_tokens_with_comment_test() {
 pub fn semantic_tokens_boolean_as_keyword_test() {
   // "true" appears as a literal in Provides
   let source =
-    "Expectations measured by \"api\"\n  * \"checkout\":\n    Provides { status: true }\n"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"api\" with: {
+    status: true
+  }"
   let tokens = semantic_tokens.get_semantic_tokens(source)
   // Find a token with length 4 (true) and type 0 (keyword)
   let has_true_keyword = find_token_with_type_and_length(tokens, 0, 4)
@@ -525,7 +536,12 @@ fn find_token_loop(tokens: List(Int), token_type: Int, length: Int) -> Bool {
 
 pub fn definition_extendable_test() {
   let source =
-    "_defaults (Provides): { env: \"production\" }\n\nExpectations measured by \"api\"\n  * \"checkout\" extends [_defaults]:\n    Provides { status: true }\n"
+    "_defaults (Provides): { env: \"production\" }
+
+\"checkout\" extends [_defaults]:
+  Guarantees 99.9% over 30d window as measured by \"api\" with: {
+    status: true
+  }"
   // Hover on _defaults in extends list (line 3)
   case definition.get_definition(source, 3, 25) {
     option.Some(#(line, _col, _len)) -> {
@@ -582,7 +598,10 @@ pub fn definition_empty_space_test() {
 
 pub fn measurement_ref_on_name_test() {
   let source =
-    "Expectations measured by \"api_availability\"\n  * \"checkout\":\n    Provides { status: true }\n"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
+    status: true
+  }"
   // Cursor on 'a' of api_availability (col 26)
   definition.get_measurement_ref_at_position(source, 0, 26)
   |> should.equal(option.Some("api_availability"))
@@ -590,7 +609,10 @@ pub fn measurement_ref_on_name_test() {
 
 pub fn measurement_ref_middle_of_name_test() {
   let source =
-    "Expectations measured by \"api_availability\"\n  * \"checkout\":\n    Provides { status: true }\n"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
+    status: true
+  }"
   // Cursor on '_' between api and availability (col 29)
   definition.get_measurement_ref_at_position(source, 0, 29)
   |> should.equal(option.Some("api_availability"))
@@ -598,7 +620,10 @@ pub fn measurement_ref_middle_of_name_test() {
 
 pub fn measurement_ref_last_char_test() {
   let source =
-    "Expectations measured by \"api_availability\"\n  * \"checkout\":\n    Provides { status: true }\n"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
+    status: true
+  }"
   // Cursor on last 'y' of api_availability (col 41)
   definition.get_measurement_ref_at_position(source, 0, 41)
   |> should.equal(option.Some("api_availability"))
@@ -606,7 +631,10 @@ pub fn measurement_ref_last_char_test() {
 
 pub fn measurement_ref_on_keyword_returns_none_test() {
   let source =
-    "Expectations measured by \"api_availability\"\n  * \"checkout\":\n    Provides { status: true }\n"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
+    status: true
+  }"
   // Cursor on "Expectations" (col 5)
   definition.get_measurement_ref_at_position(source, 0, 5)
   |> should.equal(option.None)
@@ -614,7 +642,10 @@ pub fn measurement_ref_on_keyword_returns_none_test() {
 
 pub fn measurement_ref_on_for_returns_none_test() {
   let source =
-    "Expectations measured by \"api_availability\"\n  * \"checkout\":\n    Provides { status: true }\n"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
+    status: true
+  }"
   // Cursor on "measured" (col 14)
   definition.get_measurement_ref_at_position(source, 0, 14)
   |> should.equal(option.None)
@@ -622,7 +653,10 @@ pub fn measurement_ref_on_for_returns_none_test() {
 
 pub fn measurement_ref_on_quote_returns_none_test() {
   let source =
-    "Expectations measured by \"api_availability\"\n  * \"checkout\":\n    Provides { status: true }\n"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
+    status: true
+  }"
   // Cursor on opening quote (col 25)
   definition.get_measurement_ref_at_position(source, 0, 25)
   |> should.equal(option.None)
@@ -630,7 +664,10 @@ pub fn measurement_ref_on_quote_returns_none_test() {
 
 pub fn measurement_ref_past_closing_quote_returns_none_test() {
   let source =
-    "Expectations measured by \"api_availability\"\n  * \"checkout\":\n    Provides { status: true }\n"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
+    status: true
+  }"
   // Cursor on closing quote (col 42)
   definition.get_measurement_ref_at_position(source, 0, 42)
   |> should.equal(option.None)
@@ -638,7 +675,10 @@ pub fn measurement_ref_past_closing_quote_returns_none_test() {
 
 pub fn measurement_ref_on_item_line_returns_none_test() {
   let source =
-    "Expectations measured by \"api_availability\"\n  * \"checkout\":\n    Provides { status: true }\n"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
+    status: true
+  }"
   // Cursor on item line (line 1)
   definition.get_measurement_ref_at_position(source, 1, 7)
   |> should.equal(option.None)
@@ -646,7 +686,12 @@ pub fn measurement_ref_on_item_line_returns_none_test() {
 
 pub fn measurement_ref_multiple_blocks_test() {
   let source =
-    "Expectations measured by \"api_availability\"\n  * \"checkout\":\n    Provides { threshold: 99.95 }\n\nExpectations measured by \"latency\"\n  * \"checkout_p99\":\n    Provides { threshold_ms: 500 }\n"
+    "\"checkout\":
+  Guarantees 99.95% over 30d window as measured by \"api_availability\" with: {}
+\"checkout_p99\":
+  Guarantees 99.9% over 30d window as measured by \"latency\" with: {
+    threshold_ms: 500
+  }"
   // Cursor on "latency" in second block (line 4, col 26)
   definition.get_measurement_ref_at_position(source, 4, 26)
   |> should.equal(option.Some("latency"))
@@ -673,7 +718,10 @@ pub fn measurement_ref_measurements_file_returns_none_test() {
 
 pub fn relation_ref_on_valid_path_test() {
   let source =
-    "Expectations measured by \"bp\"\n  * \"item\":\n    Provides { relations: { hard: [\"org.team.svc.dep\"] } }\n"
+    "\"item\":
+  Guarantees 99.9% over 30d window as measured by \"bp\" with: {
+    relations: { hard: [\"org.team.svc.dep\"] }
+  }"
   // Line 2, cursor on 'o' of org.team.svc.dep (col 36)
   definition.get_relation_ref_at_position(source, 2, 36)
   |> should.equal(option.Some("org.team.svc.dep"))
@@ -681,7 +729,10 @@ pub fn relation_ref_on_valid_path_test() {
 
 pub fn relation_ref_middle_of_path_test() {
   let source =
-    "Expectations measured by \"bp\"\n  * \"item\":\n    Provides { relations: { hard: [\"org.team.svc.dep\"] } }\n"
+    "\"item\":
+  Guarantees 99.9% over 30d window as measured by \"bp\" with: {
+    relations: { hard: [\"org.team.svc.dep\"] }
+  }"
   // Line 2, cursor on 't' of team (col 40)
   definition.get_relation_ref_at_position(source, 2, 40)
   |> should.equal(option.Some("org.team.svc.dep"))
@@ -689,7 +740,10 @@ pub fn relation_ref_middle_of_path_test() {
 
 pub fn relation_ref_outside_quotes_returns_none_test() {
   let source =
-    "Expectations measured by \"bp\"\n  * \"item\":\n    Provides { relations: { hard: [\"org.team.svc.dep\"] } }\n"
+    "\"item\":
+  Guarantees 99.9% over 30d window as measured by \"bp\" with: {
+    relations: { hard: [\"org.team.svc.dep\"] }
+  }"
   // Line 2, cursor on '[' (col 34) — outside quotes
   definition.get_relation_ref_at_position(source, 2, 34)
   |> should.equal(option.None)
@@ -697,7 +751,10 @@ pub fn relation_ref_outside_quotes_returns_none_test() {
 
 pub fn relation_ref_non_dependency_string_returns_none_test() {
   let source =
-    "Expectations measured by \"bp\"\n  * \"item\":\n    Provides { tags: [\"not_a_path\"] }\n"
+    "\"item\":
+  Guarantees 99.9% over 30d window as measured by \"bp\" with: {
+    tags: [\"not_a_path\"]
+  }"
   // Cursor inside "not_a_path" — not a 4-segment dotted path
   definition.get_relation_ref_at_position(source, 2, 23)
   |> should.equal(option.None)
@@ -733,7 +790,9 @@ pub fn find_name_position_not_found_test() {
 
 pub fn find_name_position_empty_name_test() {
   let content =
-    "Expectations measured by \"\"\n  * \"slo\":\n    Provides { x: true }"
+    "Expectations measured by \"\"
+  * \"slo\":
+    Provides { x: true }"
   // Empty name must not hang (JS target: split_once matches empty string at pos 0)
   position_utils.find_name_position(content, "")
   |> should.equal(Error(Nil))
@@ -812,7 +871,7 @@ pub fn find_block_end_stops_at_dedent_test() {
 // * ✅ matches exact pattern with quotes
 pub fn find_item_start_line_found_test() {
   let lines = [
-    "Expectations measured by \"test\"",
+    "",
     "  * \"api\":",
     "    Provides { x: 1 }",
     "  * \"web\":",
@@ -826,7 +885,7 @@ pub fn find_item_start_line_found_test() {
 }
 
 pub fn find_item_start_line_not_found_test() {
-  let lines = ["Expectations measured by \"test\"", "  * \"api\":"]
+  let lines = ["", "  * \"api\":"]
   position_utils.find_item_start_line(lines, "missing", 42)
   |> should.equal(42)
 }
@@ -844,7 +903,10 @@ pub fn find_item_start_line_partial_match_test() {
 pub fn find_enclosing_item_found_test() {
   let lines =
     string.split(
-      "Expectations measured by \"test\"\n  * \"my_slo\":\n    Provides { x: 1 }",
+      "\"my_slo\":
+  Guarantees 99.9% over 30d window as measured by \"test\" with: {
+    x: 1
+  }",
       "\n",
     )
   // Cursor on line 2 (Provides line), should find "my_slo"
@@ -853,7 +915,7 @@ pub fn find_enclosing_item_found_test() {
 }
 
 pub fn find_enclosing_item_none_test() {
-  let lines = string.split("Expectations measured by \"test\"", "\n")
+  let lines = string.split("", "\n")
   completion.find_enclosing_item(lines, 0)
   |> should.equal(option.None)
 }
@@ -864,7 +926,10 @@ pub fn find_enclosing_item_none_test() {
 pub fn find_enclosing_measurement_ref_found_test() {
   let lines =
     string.split(
-      "Expectations measured by \"my_measurement\"\n  * \"item\":\n    Provides { x: 1 }",
+      "\"item\":
+  Guarantees 99.9% over 30d window as measured by \"my_measurement\" with: {
+    x: 1
+  }",
       "\n",
     )
   completion.find_enclosing_measurement_ref(lines, 2)
@@ -892,7 +957,10 @@ pub fn file_utils_parse_measurements_test() {
 
 pub fn file_utils_parse_expectations_test() {
   let source =
-    "Expectations measured by \"api\"\n  * \"checkout\":\n    Provides { status: true }\n"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"api\" with: {
+    status: true
+  }"
   case file_utils.parse(source) {
     Ok(file_utils.Expects(_)) -> should.be_true(True)
     _ -> should.fail()
@@ -967,7 +1035,12 @@ pub fn find_all_name_positions_skips_partial_test() {
 
 pub fn highlight_extendable_test() {
   let source =
-    "_defaults (Provides): { env: \"production\" }\n\nExpectations measured by \"api\"\n  * \"checkout\" extends [_defaults]:\n    Provides { status: true }\n"
+    "_defaults (Provides): { env: \"production\" }
+
+\"checkout\" extends [_defaults]:
+  Guarantees 99.9% over 30d window as measured by \"api\" with: {
+    status: true
+  }"
   let highlights = highlight.get_highlights(source, 0, 2)
   // Should find _defaults at definition (line 0) and usage (line 3)
   { list.length(highlights) >= 2 } |> should.be_true()
@@ -1005,7 +1078,12 @@ pub fn highlight_empty_space_returns_empty_test() {
 
 pub fn references_extendable_test() {
   let source =
-    "_defaults (Provides): { env: \"production\" }\n\nExpectations measured by \"api\"\n  * \"checkout\" extends [_defaults]:\n    Provides { status: true }\n"
+    "_defaults (Provides): { env: \"production\" }
+
+\"checkout\" extends [_defaults]:
+  Guarantees 99.9% over 30d window as measured by \"api\" with: {
+    status: true
+  }"
   let refs = references.get_references(source, 0, 2)
   { list.length(refs) >= 2 } |> should.be_true()
 }
@@ -1040,7 +1118,10 @@ pub fn references_measurement_item_test() {
 
 pub fn references_expects_measurement_name_test() {
   let source =
-    "Expectations measured by \"api_availability\"\n  * \"checkout\":\n    Provides { status: true }\n"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
+    status: true
+  }"
   // Cursor on "api_availability" (line 0, col 26)
   let refs = references.get_references(source, 0, 26)
   { list.length(refs) >= 1 }
@@ -1063,7 +1144,10 @@ pub fn get_measurement_name_at_item_name_test() {
 
 pub fn get_measurement_name_at_expects_header_test() {
   let source =
-    "Expectations measured by \"api_availability\"\n  * \"checkout\":\n    Provides { status: true }\n"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
+    status: true
+  }"
   // Cursor on "api_availability" (line 0, col 26)
   references.get_measurement_name_at(source, 0, 26)
   |> should.equal("api_availability")
@@ -1079,7 +1163,10 @@ pub fn get_measurement_name_at_keyword_test() {
 
 pub fn get_measurement_name_at_field_value_test() {
   let source =
-    "Expectations measured by \"api\"\n  * \"checkout\":\n    Provides { status: true }\n"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"api\" with: {
+    status: true
+  }"
   // Cursor on "true" -- this is a field value, not a measurement name
   references.get_measurement_name_at(source, 2, 22)
   |> should.equal("")
@@ -1091,7 +1178,10 @@ pub fn get_measurement_name_at_field_value_test() {
 
 pub fn find_references_to_name_test() {
   let source =
-    "Expectations measured by \"api_availability\"\n  * \"checkout\":\n    Provides { status: true }\n"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
+    status: true
+  }"
   let refs = references.find_references_to_name(source, "api_availability")
   refs
   |> should.equal([#(0, 26, 16)])
@@ -1099,7 +1189,10 @@ pub fn find_references_to_name_test() {
 
 pub fn find_references_to_name_not_found_test() {
   let source =
-    "Expectations measured by \"api\"\n  * \"checkout\":\n    Provides { status: true }\n"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"api\" with: {
+    status: true
+  }"
   references.find_references_to_name(source, "missing")
   |> should.equal([])
 }
@@ -1122,7 +1215,12 @@ pub fn folding_ranges_measurements_test() {
 
 pub fn folding_ranges_expects_test() {
   let source =
-    "_defaults (Provides): { env: \"production\" }\n\nExpectations measured by \"api\"\n  * \"checkout\" extends [_defaults]:\n    Provides { status: true }\n"
+    "_defaults (Provides): { env: \"production\" }
+
+\"checkout\" extends [_defaults]:
+  Guarantees 99.9% over 30d window as measured by \"api\" with: {
+    status: true
+  }"
   let ranges = folding_range.get_folding_ranges(source)
   { ranges != [] } |> should.be_true()
 }
@@ -1211,7 +1309,12 @@ fn find_outermost(sr: SelectionRange) -> SelectionRange {
 
 pub fn linked_editing_range_extendable_test() {
   let source =
-    "_defaults (Provides): { env: \"production\" }\n\nExpectations measured by \"api\"\n  * \"checkout\" extends [_defaults]:\n    Provides { status: true }\n"
+    "_defaults (Provides): { env: \"production\" }
+
+\"checkout\" extends [_defaults]:
+  Guarantees 99.9% over 30d window as measured by \"api\" with: {
+    status: true
+  }"
   let ranges = linked_editing_range.get_linked_editing_ranges(source, 0, 2)
   { list.length(ranges) >= 2 } |> should.be_true()
 }
@@ -1248,7 +1351,10 @@ pub fn hover_measurement_item_test() {
 
 pub fn hover_expect_item_test() {
   let source =
-    "Expectations measured by \"api\"\n  * \"checkout\":\n    Provides { status: true }\n"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"api\" with: {
+    status: true
+  }"
   case hover.get_hover(source, 1, 7, []) {
     option.Some(md) -> {
       { string.contains(md, "checkout") } |> should.be_true()
@@ -1305,14 +1411,20 @@ pub fn extends_completion_filters_used_test() {
 
 pub fn cross_file_known_measurement_no_diagnostics_test() {
   let source =
-    "Expectations measured by \"api_availability\"\n  * \"checkout\":\n    Provides { status: true }\n"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
+    status: true
+  }"
   diagnostics.get_cross_file_diagnostics(source, ["api_availability"])
   |> should.equal([])
 }
 
 pub fn cross_file_unknown_measurement_returns_diagnostic_test() {
   let source =
-    "Expectations measured by \"api_availability\"\n  * \"checkout\":\n    Provides { status: true }\n"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
+    status: true
+  }"
   let diags =
     diagnostics.get_cross_file_diagnostics(source, ["other_measurement"])
   case diags {
@@ -1340,7 +1452,14 @@ pub fn cross_file_empty_content_returns_empty_test() {
 
 pub fn cross_file_multiple_blocks_mixed_test() {
   let source =
-    "Expectations measured by \"known_bp\"\n  * \"item1\":\n    Provides { a: true }\n\nExpectations measured by \"unknown_bp\"\n  * \"item2\":\n    Provides { b: false }\n"
+    "\"item1\":
+  Guarantees 99.9% over 30d window as measured by \"known_bp\" with: {
+    a: true
+  }
+\"item2\":
+  Guarantees 99.9% over 30d window as measured by \"unknown_bp\" with: {
+    b: false
+  }"
   let diags = diagnostics.get_cross_file_diagnostics(source, ["known_bp"])
   case diags {
     [diag] -> {
@@ -1353,7 +1472,10 @@ pub fn cross_file_multiple_blocks_mixed_test() {
 
 pub fn cross_file_empty_known_list_reports_all_test() {
   let source =
-    "Expectations measured by \"my_measurement\"\n  * \"item\":\n    Provides { status: true }\n"
+    "\"item\":
+  Guarantees 99.9% over 30d window as measured by \"my_measurement\" with: {
+    status: true
+  }"
   let diags = diagnostics.get_cross_file_diagnostics(source, [])
   case diags {
     [diag] -> {
@@ -1374,7 +1496,10 @@ pub fn cross_file_empty_known_list_reports_all_test() {
 
 pub fn dependency_known_target_no_diagnostics_test() {
   let source =
-    "Expectations measured by \"bp\"\n  * \"item\":\n    Provides { relations: { hard: [\"org.team.svc.dep\"] } }\n"
+    "\"item\":
+  Guarantees 99.9% over 30d window as measured by \"bp\" with: {
+    relations: { hard: [\"org.team.svc.dep\"] }
+  }"
   diagnostics.get_cross_file_dependency_diagnostics(source, [
     "org.team.svc.dep",
   ])
@@ -1383,7 +1508,10 @@ pub fn dependency_known_target_no_diagnostics_test() {
 
 pub fn dependency_unknown_target_returns_diagnostic_test() {
   let source =
-    "Expectations measured by \"bp\"\n  * \"item\":\n    Provides { relations: { hard: [\"org.team.svc.dep\"] } }\n"
+    "\"item\":
+  Guarantees 99.9% over 30d window as measured by \"bp\" with: {
+    relations: { hard: [\"org.team.svc.dep\"] }
+  }"
   let diags = diagnostics.get_cross_file_dependency_diagnostics(source, [])
   case diags {
     [diag] -> {
@@ -1403,14 +1531,20 @@ pub fn dependency_empty_content_returns_empty_test() {
 
 pub fn dependency_no_relations_returns_empty_test() {
   let source =
-    "Expectations measured by \"bp\"\n  * \"item\":\n    Provides { status: true }\n"
+    "\"item\":
+  Guarantees 99.9% over 30d window as measured by \"bp\" with: {
+    status: true
+  }"
   diagnostics.get_cross_file_dependency_diagnostics(source, [])
   |> should.equal([])
 }
 
 pub fn dependency_multiple_mixed_test() {
   let source =
-    "Expectations measured by \"bp\"\n  * \"item\":\n    Provides { relations: { hard: [\"known.t.s.dep\", \"unknown.t.s.dep\"] } }\n"
+    "\"item\":
+  Guarantees 99.9% over 30d window as measured by \"bp\" with: {
+    relations: { hard: [\"known.t.s.dep\", \"unknown.t.s.dep\"] }
+  }"
   let diags =
     diagnostics.get_cross_file_dependency_diagnostics(source, [
       "known.t.s.dep",
@@ -1426,7 +1560,10 @@ pub fn dependency_multiple_mixed_test() {
 
 pub fn dependency_duplicate_targets_single_diagnostic_test() {
   let source =
-    "Expectations measured by \"bp\"\n  * \"item\":\n    Provides { relations: { hard: [\"org.t.s.dep\"], soft: [\"org.t.s.dep\"] } }\n"
+    "\"item\":
+  Guarantees 99.9% over 30d window as measured by \"bp\" with: {
+    relations: { hard: [\"org.t.s.dep\"], soft: [\"org.t.s.dep\"] }
+  }"
   let diags = diagnostics.get_cross_file_dependency_diagnostics(source, [])
   case diags {
     [diag] -> {
@@ -1456,14 +1593,20 @@ pub fn all_diagnostics_empty_content_test() {
 
 pub fn all_diagnostics_valid_expects_known_measurement_test() {
   let source =
-    "Expectations measured by \"api_availability\"\n  * \"checkout\":\n    Provides { status: true }\n"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
+    status: true
+  }"
   diagnostics.get_all_diagnostics(source, ["api_availability"], [])
   |> should.equal([])
 }
 
 pub fn all_diagnostics_unknown_measurement_test() {
   let source =
-    "Expectations measured by \"api_availability\"\n  * \"checkout\":\n    Provides { status: true }\n"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
+    status: true
+  }"
   let diags = diagnostics.get_all_diagnostics(source, [], [])
   let has_bp_not_found =
     list.any(diags, fn(d) {
@@ -1475,7 +1618,10 @@ pub fn all_diagnostics_unknown_measurement_test() {
 
 pub fn all_diagnostics_unknown_dependency_test() {
   let source =
-    "Expectations measured by \"bp\"\n  * \"item\":\n    Provides { relations: { hard: [\"org.team.svc.dep\"] } }\n"
+    "\"item\":
+  Guarantees 99.9% over 30d window as measured by \"bp\" with: {
+    relations: { hard: [\"org.team.svc.dep\"] }
+  }"
   let diags = diagnostics.get_all_diagnostics(source, ["bp"], [])
   let has_dep_not_found =
     list.any(diags, fn(d) {
@@ -1488,7 +1634,11 @@ pub fn all_diagnostics_unknown_dependency_test() {
 pub fn all_diagnostics_combines_all_checks_test() {
   // Expects file with validation error (undefined extendable), unknown measurement, and unknown dep
   let source =
-    "Expectations measured by \"unknown_bp\"\n  * \"item\" extends [_nonexistent]:\n    Provides { env: \"staging\", relations: { hard: [\"org.t.s.dep\"] } }\n"
+    "\"item\" extends [_nonexistent]:
+  Guarantees 99.9% over 30d window as measured by \"unknown_bp\" with: {
+    env: \"staging\",
+    relations: { hard: [\"org.t.s.dep\"] }
+  }"
   let diags = diagnostics.get_all_diagnostics(source, [], [])
   // Should have validation error (undefined extendable), measurement not found, and dependency not found
   let has_undefined =
@@ -1551,12 +1701,15 @@ _base (Requires): { env: String }
 
 pub fn workspace_symbols_expects_test() {
   let source =
-    "Expectations measured by \"api_availability\"
-  * \"checkout\":
-    Provides { status: true }
-  * \"payments\":
-    Provides { status: true }
-"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
+    status: true
+  }
+
+\"payments\":
+  Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
+    status: true
+  }"
   let symbols = workspace_symbols.get_workspace_symbols(source)
   let names = list.map(symbols, fn(s) { s.name })
   // Should include expect items
@@ -1635,10 +1788,10 @@ pub fn type_hierarchy_measurement_item_test() {
 
 pub fn type_hierarchy_expect_item_test() {
   let source =
-    "Expectations measured by \"api_availability\"
-  * \"checkout\":
-    Provides { status: true }
-"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {
+    status: true
+  }"
   let items = type_hierarchy.prepare_type_hierarchy(source, 1, 7)
   case items {
     [item] -> {
@@ -1684,7 +1837,14 @@ pub fn type_hierarchy_field_name_returns_empty_test() {
 
 pub fn type_hierarchy_multiple_expects_blocks_test() {
   let source =
-    "Expectations measured by \"bp_one\"\n  * \"item_a\":\n    Provides { status: true }\n\nExpectations measured by \"bp_two\"\n  * \"item_b\":\n    Provides { active: false }\n"
+    "\"item_a\":
+  Guarantees 99.9% over 30d window as measured by \"bp_one\" with: {
+    status: true
+  }
+\"item_b\":
+  Guarantees 99.9% over 30d window as measured by \"bp_two\" with: {
+    active: false
+  }"
   let items = type_hierarchy.prepare_type_hierarchy(source, 5, 7)
   case items {
     [item] -> {
@@ -1744,7 +1904,7 @@ pub fn measurement_header_completion_empty_without_names_test() {
 }
 
 pub fn measurement_header_completion_not_after_closing_quote_test() {
-  let source = "Expectations measured by \"api_availability\""
+  let source = ""
   // Cursor after the closing quote — should NOT be in header context
   let items =
     completion.get_completions(source, 0, 44, ["api_availability", "other"], [])
@@ -1785,12 +1945,10 @@ pub fn compile_validated_measurements_expects_file_test() {
   // An expects-format file now parses as an empty measurements file via error
   // recovery (the measurements parser skips unrecognized tokens and finds no items).
   let source =
-    "Expectations measured by \"my_slo\"
-  * \"checkout\":
-    Provides {
-      env: \"prod\"
-    }
-"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"my_slo\" with: {
+    env: \"prod\"
+  }"
   case linker_diagnostics.compile_validated_measurements(source) {
     Ok(measurements) -> {
       // Empty list — no measurement items found
@@ -1823,12 +1981,10 @@ pub fn linker_diagnostics_all_correct_test() {
     linker_diagnostics.compile_validated_measurements(bp_source)
 
   let ex_source =
-    "Expectations measured by \"my_slo\"
-  * \"checkout\":
-    Provides {
-      env: \"prod\"
-    }
-"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"my_slo\" with: {
+    env: \"prod\"
+  }"
   linker_diagnostics.get_linker_diagnostics(ex_source, measurements)
   |> should.equal([])
 }
@@ -1848,11 +2004,8 @@ pub fn linker_diagnostics_missing_required_field_test() {
 
   // Missing 'env' and 'status' — both are required remaining params
   let ex_source =
-    "Expectations measured by \"my_slo\"
-  * \"checkout\":
-    Provides {
-    }
-"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"my_slo\" with: {}"
   let diags = linker_diagnostics.get_linker_diagnostics(ex_source, measurements)
   case diags {
     [diag] -> {
@@ -1879,13 +2032,11 @@ pub fn linker_diagnostics_unknown_field_test() {
     linker_diagnostics.compile_validated_measurements(bp_source)
 
   let ex_source =
-    "Expectations measured by \"my_slo\"
-  * \"checkout\":
-    Provides {
-      env: \"prod\",
-      xyz: \"unknown\"
-    }
-"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"my_slo\" with: {
+    env: \"prod\",
+    xyz: \"unknown\"
+  }"
   let diags = linker_diagnostics.get_linker_diagnostics(ex_source, measurements)
   let unknown_diags =
     list.filter(diags, fn(d) { d.code == diagnostics.UnknownField })
@@ -1911,13 +2062,10 @@ pub fn linker_diagnostics_type_mismatch_test() {
 
   // Providing an integer for 'threshold' which expects Percentage (float)
   let ex_source =
-    "Expectations measured by \"my_slo\"
-  * \"checkout\":
-    Provides {
-      env: \"prod\",
-      threshold: 99
-    }
-"
+    "\"checkout\":
+  Guarantees 99% over 30d window as measured by \"my_slo\" with: {
+    env: \"prod\"
+  }"
   let diags = linker_diagnostics.get_linker_diagnostics(ex_source, measurements)
   let type_diags =
     list.filter(diags, fn(d) { d.code == diagnostics.TypeMismatch })
@@ -1944,12 +2092,10 @@ pub fn linker_diagnostics_optional_defaulted_omitted_test() {
 
   // Omitting optional fields (tags, runbook) and defaulted field (window_in_days) — no errors
   let ex_source =
-    "Expectations measured by \"my_slo\"
-  * \"checkout\":
-    Provides {
-      env: \"prod\"
-    }
-"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"my_slo\" with: {
+    env: \"prod\"
+  }"
   linker_diagnostics.get_linker_diagnostics(ex_source, measurements)
   |> should.equal([])
 }
@@ -1969,24 +2115,20 @@ pub fn linker_diagnostics_unknown_measurement_ref_test() {
 
   // Measurement ref "nonexistent" does not match — handled elsewhere, no linker diagnostic
   let ex_source =
-    "Expectations measured by \"nonexistent\"
-  * \"checkout\":
-    Provides {
-      env: \"prod\"
-    }
-"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"nonexistent\" with: {
+    env: \"prod\"
+  }"
   linker_diagnostics.get_linker_diagnostics(ex_source, measurements)
   |> should.equal([])
 }
 
 pub fn linker_diagnostics_empty_measurements_test() {
   let ex_source =
-    "Expectations measured by \"my_slo\"
-  * \"checkout\":
-    Provides {
-      env: \"prod\"
-    }
-"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"my_slo\" with: {
+    env: \"prod\"
+  }"
   linker_diagnostics.get_linker_diagnostics(ex_source, [])
   |> should.equal([])
 }
@@ -2014,13 +2156,10 @@ pub fn measurement_aware_completion_suggests_params_test() {
     linker_diagnostics.compile_validated_measurements(bp_source)
 
   let ex_source =
-    "Expectations measured by \"my_slo\"
-  * \"checkout\":
-    Provides {
-      env: \"prod\"
-
-    }
-"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"my_slo\" with: {
+    env: \"prod\"
+  }"
   // Line 4 is the empty line inside Provides
   let items = completion.get_completions(ex_source, 4, 6, [], measurements)
   let labels = list.map(items, fn(i) { i.label })
@@ -2063,13 +2202,10 @@ pub fn measurement_aware_completion_unknown_measurement_test() {
   // This expects file references "nonexistent" which doesn't match any measurement
   // No measurement params should appear, falls through to general context
   let ex_source =
-    "Expectations measured by \"nonexistent\"
-  * \"checkout\":
-    Provides {
-      env: \"prod\"
-
-    }
-"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"nonexistent\" with: {
+    env: \"prod\"
+  }"
   let items = completion.get_completions(ex_source, 4, 6, [], measurements)
   let labels = list.map(items, fn(i) { i.label })
   // Should NOT contain measurement-specific params like "env"
@@ -2102,13 +2238,11 @@ pub fn signature_help_in_provides_test() {
     linker_diagnostics.compile_validated_measurements(bp_source)
 
   let ex_source =
-    "Expectations measured by \"my_slo\"
-  * \"checkout\":
-    Provides {
-      env: \"prod\"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"my_slo\" with: {
+    env: \"prod\"
       status: true
-    }
-"
+  }"
   // Cursor on the env field line (line 3)
   case signature_help.get_signature_help(ex_source, 3, 10, measurements) {
     option.Some(sig) -> {
@@ -2135,13 +2269,11 @@ pub fn signature_help_active_parameter_test() {
     linker_diagnostics.compile_validated_measurements(bp_source)
 
   let ex_source =
-    "Expectations measured by \"my_slo\"
-  * \"checkout\":
-    Provides {
-      env: \"prod\"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"my_slo\" with: {
+    env: \"prod\"
       status: true
-    }
-"
+  }"
   // Cursor on the status line (line 4)
   case signature_help.get_signature_help(ex_source, 4, 10, measurements) {
     option.Some(sig) -> {
@@ -2163,9 +2295,7 @@ pub fn signature_help_none_for_measurements_test() {
 }
 
 pub fn signature_help_none_outside_item_test() {
-  let ex_source =
-    "Expectations measured by \"my_slo\"
-"
+  let ex_source = ""
   signature_help.get_signature_help(ex_source, 0, 5, [])
   |> should.equal(option.None)
 }
@@ -2194,12 +2324,10 @@ pub fn inlay_hints_shows_types_test() {
     linker_diagnostics.compile_validated_measurements(bp_source)
 
   let ex_source =
-    "Expectations measured by \"my_slo\"
-  * \"checkout\":
-    Provides {
-      env: \"prod\"
-    }
-"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"my_slo\" with: {
+    env: \"prod\"
+  }"
   let hints = inlay_hints.get_inlay_hints(ex_source, 0, 10, measurements)
   // Should have at least one hint for the "env" field
   { hints != [] } |> should.be_true()
@@ -2234,12 +2362,10 @@ pub fn inlay_hints_no_match_no_hints_test() {
 
   // Measurement ref "nonexistent" doesn't match
   let ex_source =
-    "Expectations measured by \"nonexistent\"
-  * \"checkout\":
-    Provides {
-      env: \"prod\"
-    }
-"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"nonexistent\" with: {
+    env: \"prod\"
+  }"
   inlay_hints.get_inlay_hints(ex_source, 0, 10, measurements)
   |> should.equal([])
 }
@@ -2258,13 +2384,11 @@ pub fn inlay_hints_respects_range_test() {
     linker_diagnostics.compile_validated_measurements(bp_source)
 
   let ex_source =
-    "Expectations measured by \"my_slo\"
-  * \"checkout\":
-    Provides {
-      env: \"prod\"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"my_slo\" with: {
+    env: \"prod\"
       status: true
-    }
-"
+  }"
   // Only request hints for line 0 (header line) — should get no field hints
   let hints = inlay_hints.get_inlay_hints(ex_source, 0, 0, measurements)
   hints |> should.equal([])
@@ -2285,16 +2409,15 @@ pub fn inlay_hints_duplicate_field_names_test() {
 
   // Two items both have an "env" field — hints should point to correct lines
   let ex_source =
-    "Expectations measured by \"my_slo\"
-  * \"checkout\":
-    Provides {
-      env: \"prod\"
-    }
-  * \"payments\":
-    Provides {
-      env: \"staging\"
-    }
-"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"my_slo\" with: {
+    env: \"prod\"
+  }
+
+\"payments\":
+  Guarantees 99.9% over 30d window as measured by \"my_slo\" with: {
+    env: \"staging\"
+  }"
   let hints = inlay_hints.get_inlay_hints(ex_source, 0, 20, measurements)
   // Should have exactly 2 hints (one per item's env field)
   list.length(hints) |> should.equal(2)
@@ -2326,12 +2449,10 @@ pub fn linker_diagnostics_type_mismatch_includes_actual_type_test() {
   let assert Ok(measurements) =
     linker_diagnostics.compile_validated_measurements(bp_source)
   let ex_source =
-    "Expectations measured by \"my_slo\"
-  * \"checkout\":
-    Provides {
-      env: 42
-    }
-"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"my_slo\" with: {
+    env: 42
+  }"
   let diags = linker_diagnostics.get_linker_diagnostics(ex_source, measurements)
   let type_diags =
     list.filter(diags, fn(d) { d.code == diagnostics.TypeMismatch })
@@ -2362,12 +2483,10 @@ pub fn inlay_hints_shows_default_values_test() {
   let assert Ok(measurements) =
     linker_diagnostics.compile_validated_measurements(bp_source)
   let ex_source =
-    "Expectations measured by \"my_slo\"
-  * \"checkout\":
-    Provides {
-      env: \"prod\"
-    }
-"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"my_slo\" with: {
+    env: \"prod\"
+  }"
   let hints = inlay_hints.get_inlay_hints(ex_source, 0, 10, measurements)
   let labels = list.map(hints, fn(h) { h.label })
   let has_default = list.any(labels, fn(l) { string.contains(l, "= ") })
@@ -2493,10 +2612,8 @@ pub fn unused_extendable_in_expects_file_warning_test() {
   let source =
     "_unused (Provides): { window_in_days: 30 }
 
-Expectations measured by \"api_availability\"
-  * \"checkout\":
-    Provides { threshold: 99.9% }
-"
+\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {}"
   let diags = diagnostics.get_diagnostics(source)
   case diags {
     [diag] -> {
@@ -2512,10 +2629,8 @@ pub fn used_extendable_in_expects_file_no_warning_test() {
   let source =
     "_defaults (Provides): { window_in_days: 30 }
 
-Expectations measured by \"api_availability\"
-  * \"checkout\" extends [_defaults]:
-    Provides { threshold: 99.9% }
-"
+\"checkout\" extends [_defaults]:
+  Guarantees 99.9% over 30d window as measured by \"api_availability\" with: {}"
   diagnostics.get_diagnostics(source)
   |> should.equal([])
 }
@@ -2524,10 +2639,8 @@ pub fn used_extendable_in_unmeasured_expects_no_warning_test() {
   let source =
     "_defaults (Provides): { window_in_days: 30 }
 
-Unmeasured Expectations
-  * \"checkout\" extends [_defaults]:
-    Provides { threshold: 99.9% }
-"
+\"checkout\" extends [_defaults]:
+  Guarantees 99.9% over 30d window"
   diagnostics.get_diagnostics(source)
   |> should.equal([])
 }
@@ -2550,10 +2663,10 @@ pub fn hover_expect_item_shows_measurement_requires_test() {
   let assert Ok(measurements) =
     linker_diagnostics.compile_validated_measurements(bp_source)
   let source =
-    "Expectations measured by \"my_slo\"
-  * \"checkout\":
-    Provides { env: \"prod\" }
-"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"my_slo\" with: {
+    env: \"prod\"
+  }"
   case hover.get_hover(source, 1, 7, measurements) {
     option.Some(markdown) -> {
       string.contains(markdown, "checkout") |> should.be_true()
@@ -2582,12 +2695,8 @@ pub fn field_completion_snippet_test() {
   let assert Ok(measurements) =
     linker_diagnostics.compile_validated_measurements(bp_source)
   let source =
-    "Expectations measured by \"my_slo\"
-  * \"checkout\":
-    Provides {
-
-    }
-"
+    "\"checkout\":
+  Guarantees 99.9% over 30d window as measured by \"my_slo\" with: {}"
   let items = completion.get_completions(source, 3, 6, [], measurements)
   let env_items = list.filter(items, fn(i) { i.label == "env" })
   case env_items {
@@ -2723,7 +2832,12 @@ pub fn find_defined_symbol_positions_extendable_test() {
 
 pub fn find_defined_symbol_positions_item_name_test() {
   let content =
-    "\"api_avail\":\n  Requires {}\n  Provides {}\n\nExpectations measured by \"api_avail\"\n  * \"my_slo\":\n    Provides {}\n"
+    "\"api_avail\":
+  Requires {}
+  Provides {}
+
+\"my_slo\":
+  Guarantees 99.9% over 30d window as measured by \"api_avail\" with: {}"
   // Cursor on 'api_avail' at line 0, col 1 (inside quotes of the item name)
   let result = position_utils.find_defined_symbol_positions(content, 0, 1)
   // Should find the measurement item name and the expectations reference
@@ -2746,7 +2860,10 @@ pub fn find_defined_symbol_positions_non_symbol_test() {
 
 pub fn relation_ref_with_range_valid_test() {
   let source =
-    "Expectations measured by \"bp\"\n  * \"item\":\n    Provides { relations: { hard: [\"org.team.svc.dep\"] } }\n"
+    "\"item\":
+  Guarantees 99.9% over 30d window as measured by \"bp\" with: {
+    relations: { hard: [\"org.team.svc.dep\"] }
+  }"
   // Line 2, cursor on 'o' of org.team.svc.dep
   case definition.get_relation_ref_with_range_at_position(source, 2, 36) {
     option.Some(#(ref, start_col)) -> {
@@ -2760,7 +2877,10 @@ pub fn relation_ref_with_range_valid_test() {
 
 pub fn relation_ref_with_range_outside_quotes_test() {
   let source =
-    "Expectations measured by \"bp\"\n  * \"item\":\n    Provides { relations: { hard: [\"org.team.svc.dep\"] } }\n"
+    "\"item\":
+  Guarantees 99.9% over 30d window as measured by \"bp\" with: {
+    relations: { hard: [\"org.team.svc.dep\"] }
+  }"
   // Line 2, cursor on '[' — outside quotes
   definition.get_relation_ref_with_range_at_position(source, 2, 34)
   |> should.equal(option.None)
@@ -2768,7 +2888,10 @@ pub fn relation_ref_with_range_outside_quotes_test() {
 
 pub fn relation_ref_with_range_non_dotted_test() {
   let source =
-    "Expectations measured by \"bp\"\n  * \"item\":\n    Provides { tags: [\"not_a_path\"] }\n"
+    "\"item\":
+  Guarantees 99.9% over 30d window as measured by \"bp\" with: {
+    tags: [\"not_a_path\"]
+  }"
   // Cursor inside "not_a_path" — not 4-segment dotted
   definition.get_relation_ref_with_range_at_position(source, 2, 23)
   |> should.equal(option.None)

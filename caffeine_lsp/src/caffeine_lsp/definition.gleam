@@ -1,4 +1,4 @@
-import caffeine_lang/frontend/ast.{type ExpectsBlock}
+import caffeine_lang/frontend/ast
 import caffeine_lsp/file_utils
 import caffeine_lsp/position_utils
 import gleam/bool
@@ -59,9 +59,7 @@ fn find_in_expects(
   let all_names =
     list.flatten([
       list.map(file.extendables, fn(e) { e.name }),
-      list.flat_map(file.blocks, fn(b) {
-        list.map(b.items, fn(item) { item.name })
-      }),
+      list.map(file.items, fn(item) { item.name }),
     ])
   case list.find(all_names, fn(n) { n == name }) {
     Ok(_) -> find_name_location(content, name)
@@ -80,7 +78,7 @@ fn find_name_location(
 }
 
 /// Returns the measurement name if the cursor is on a measurement reference
-/// in an `Expectations measured by "name"` header, or None otherwise.
+/// inside an `as measured by "name"` clause on the current line, or None.
 pub fn get_measurement_ref_at_position(
   content: String,
   line: Int,
@@ -91,7 +89,7 @@ pub fn get_measurement_ref_at_position(
       let lines = string.split(content, "\n")
       case list.drop(lines, line) {
         [line_text, ..] ->
-          find_measurement_ref_on_line(line_text, character, file.blocks)
+          find_measurement_ref_on_line(line_text, character, file.items)
         [] -> option.None
       }
     }
@@ -174,28 +172,30 @@ fn is_dependency_path(s: String) -> Bool {
   }
 }
 
-/// Check if the cursor is on a measurement name within an Expectations header.
-/// Unmeasured blocks (measurement = None) are skipped.
+/// Check if the cursor is on a measurement name inside an
+/// `as measured by "name"` clause. Iterates over each expect item's
+/// `measured_by` reference and checks whether the cursor falls on that
+/// quoted name in the current line.
 fn find_measurement_ref_on_line(
   line_text: String,
   character: Int,
-  blocks: List(ExpectsBlock),
+  items: List(ast.ExpectItem),
 ) -> Option(String) {
-  let prefix = "Expectations measured by \""
+  let prefix = "as measured by \""
   use <- bool.guard(!string.contains(line_text, prefix), option.None)
-  list.find_map(blocks, fn(block) {
-    case block.measurement {
+  list.find_map(items, fn(item) {
+    case item.guarantees.measured_by {
       option.None -> Error(Nil)
-      option.Some(measurement) -> {
-        let pattern = prefix <> measurement <> "\""
+      option.Some(mb) -> {
+        let pattern = prefix <> mb.measurement <> "\""
         use <- bool.guard(!string.contains(line_text, pattern), Error(Nil))
         case string.split_once(line_text, prefix) {
           Error(_) -> Error(Nil)
           Ok(#(before, _)) -> {
             let name_start = string.length(before) + string.length(prefix)
-            let name_end = name_start + string.length(measurement)
+            let name_end = name_start + string.length(mb.measurement)
             case character >= name_start && character < name_end {
-              True -> Ok(measurement)
+              True -> Ok(mb.measurement)
               False -> Error(Nil)
             }
           }

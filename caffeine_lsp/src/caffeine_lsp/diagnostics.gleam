@@ -1,6 +1,6 @@
 import caffeine_lang/frontend/ast.{
-  type ExpectsBlock, type ExpectsFile, type MeasurementsFile, type Parsed,
-  type Struct, type Value, ExtendableRequires, TypeValue,
+  type ExpectsFile, type MeasurementsFile, type Parsed, type Struct, type Value,
+  ExtendableRequires, TypeValue,
 }
 import caffeine_lang/frontend/parser_error.{type ParserError}
 import caffeine_lang/frontend/tokenizer_error.{type TokenizerError}
@@ -128,6 +128,8 @@ pub fn get_cross_file_diagnostics(
 }
 
 /// Measurement reference checks from a successfully parsed file.
+/// Walks each expect item's `as measured by "..."` clause and reports refs not
+/// in the workspace.
 fn get_cross_file_from_parsed(
   content: String,
   parsed: file_utils.ParsedFile,
@@ -135,24 +137,25 @@ fn get_cross_file_from_parsed(
 ) -> List(Diagnostic) {
   case parsed {
     file_utils.Expects(file) ->
-      file.blocks
-      |> list.filter_map(fn(block) {
-        check_measurement_ref(content, block, known_measurements)
+      file.items
+      |> list.filter_map(fn(item) {
+        check_measurement_ref(content, item, known_measurements)
       })
     _ -> []
   }
 }
 
-/// Check a single expects block's measurement reference against known measurements.
-/// Unmeasured blocks (measurement = None) are skipped.
+/// Check a single expect item's `as measured by` reference against known
+/// measurements. Items without `as measured by` (unmeasured) are skipped.
 fn check_measurement_ref(
   content: String,
-  block: ExpectsBlock,
+  item: ast.ExpectItem,
   known_measurements: List(String),
 ) -> Result(Diagnostic, Nil) {
-  case block.measurement {
+  case item.guarantees.measured_by {
     option.None -> Error(Nil)
-    option.Some(measurement) -> {
+    option.Some(mb) -> {
+      let measurement = mb.measurement
       use <- bool.guard(
         when: list.contains(known_measurements, measurement),
         return: Error(Nil),
@@ -220,16 +223,17 @@ fn extract_relation_targets_from_measurements(
 fn extract_relation_targets_from_expects(
   file: ExpectsFile(Parsed),
 ) -> List(String) {
-  file.blocks
-  |> list.flat_map(fn(block) {
-    block.items
-    |> list.flat_map(fn(item) {
-      extract_relation_targets_from_struct(item.provides)
-    })
+  file.items
+  |> list.flat_map(fn(item) {
+    case item.assumes {
+      option.None -> []
+      option.Some(a) -> list.map(a.deps, fn(d) { d.target })
+    }
   })
 }
 
-/// Walk a provides struct to find relation target strings.
+/// Walk a provides struct to find relation target strings. Retained for
+/// measurement-side processing; expectation deps now live in `Assumes:`.
 fn extract_relation_targets_from_struct(provides: Struct) -> List(String) {
   provides.fields
   |> list.filter_map(fn(field) {
@@ -334,9 +338,7 @@ fn get_unused_warnings_expects(
   get_unused_extendable_warnings(
     content,
     file.extendables,
-    list.flat_map(file.blocks, fn(b) {
-      list.flat_map(b.items, fn(i) { i.extends })
-    }),
+    list.flat_map(file.items, fn(i) { i.extends }),
   )
 }
 

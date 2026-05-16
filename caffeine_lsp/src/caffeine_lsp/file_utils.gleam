@@ -49,11 +49,8 @@ pub fn parse(
   }
 }
 
-/// Detect expects file content by scanning for markers unique to expects files.
-/// Checks for "Expectations measured by" or "Unmeasured Expectations" which
-/// cannot appear in measurement files. Handles expects files that start with
-/// extendables, comments, or unmeasured blocks.
+/// Detect expects file content by scanning for the `Guarantees` keyword,
+/// which appears on every expectation and cannot appear in measurement files.
 fn is_expects_content(content: String) -> Bool {
-  string.contains(content, "Expectations measured by")
-  || string.contains(content, "Unmeasured Expectations")
+  string.contains(content, "Guarantees")
 }
