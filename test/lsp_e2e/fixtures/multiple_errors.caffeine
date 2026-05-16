@@ -1,7 +1,4 @@
-Expectations measured by "nonexistent_measurement_aaa"
-  * "item_one":
-    Provides { threshold: 99.9 }
-
-Expectations measured by "nonexistent_measurement_bbb"
-  * "item_two":
-    Provides { threshold: 99.5 }
+"item_one":
+  Guarantees 99.9% over 30d window as measured by "nonexistent_measurement_aaa" with: {}
+"item_two":
+  Guarantees 99.5% over 30d window as measured by "nonexistent_measurement_bbb" with: {}

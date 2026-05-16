@@ -1,6 +1,5 @@
-Expectations measured by "test_measurement"
-  * "test_expectation":
-    Provides {
-      env: "production",
-      status: true
-    }
+"test_expectation":
+  Guarantees 99.9% over 30d window as measured by "test_measurement" with: {
+    env: "production",
+    status: true
+  }

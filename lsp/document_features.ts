@@ -265,13 +265,22 @@ export function handleInlayHints(ctx: HandlerContext, params: any) {
 
 // --- Code lenses (SLO overlay) ---
 
-/** Extract expectation item names and their line positions from an expects file. */
+/** Extract expectation item names and their line positions from an expects file.
+ *
+ * Under the envelope grammar every expectation is `"name":` at column 0 of its
+ * own line, followed (on subsequent lines) by an optional `Assumes:` section
+ * and a required `Guarantees ...` clause. We use the presence of `Guarantees`
+ * anywhere in the file as the cheap is-this-an-expects-file gate, then collect
+ * top-level `"name":` lines (skipping `#`-commented ones).
+ */
 export function extractExpectationPositions(text: string): Array<{ name: string; line: number }> {
   const results: Array<{ name: string; line: number }> = [];
-  if (!text.includes("Expectations measured by")) return results;
+  if (!text.includes("Guarantees")) return results;
 
   const lines = text.split("\n");
-  const pattern = /\*\s+"([^"]+)"/;
+  // Top-level item header: zero leading whitespace, "<name>": with nothing else
+  // significant on the line.
+  const pattern = /^"([^"]+)"(?:\s+extends\s+\[[^\]]*\])?\s*:\s*$/;
   for (let i = 0; i < lines.length; i++) {
     if (lines[i].trimStart().startsWith("#")) continue;
     const match = pattern.exec(lines[i]);

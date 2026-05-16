@@ -6,12 +6,14 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 /** Extract measurement item names from a file's text. Returns empty array for non-measurement files.
- *  Measurement items start with `"name":` at column 0 (no `*` prefix).
- *  Non-expectations files are measurement files. */
+ *  Measurement items start with `"name":` at column 0. Under the envelope
+ *  grammar, expects files use that same item-header shape but follow it with
+ *  `Guarantees ...` clauses (and never have `Requires`/`Provides`). We
+ *  disambiguate by treating a file with `Guarantees` as an expects file. */
 export function extractMeasurementNames(text: string): string[] {
-  if (text.includes("Expectations")) return [];
+  if (text.includes("Guarantees")) return [];
   const names: string[] = [];
-  const pattern = /^"([^"]+)"\s*(?:extends\s*\[|:)/;
+  const pattern = /^"([^"]+)"(?:\s+success_rate|\s+time_slice)?\s*(?:extends\s*\[|:)/;
   for (const line of text.split("\n")) {
     if (line.trimStart().startsWith("#")) continue;
     const match = pattern.exec(line);
@@ -21,13 +23,14 @@ export function extractMeasurementNames(text: string): string[] {
 }
 
 /** Find the location of a measurement item (e.g. "name":) within a measurement file.
- *  Measurement items start with `"name":` at column 0. */
+ *  Measurement items start with `"name":` at column 0, optionally with a
+ *  `success_rate` / `time_slice` declared type and/or an `extends [...]` clause. */
 export function findMeasurementItemLocation(
   text: string,
   itemName: string,
 ): { line: number; col: number; nameLen: number } | null {
   const lines = text.split("\n");
-  const pattern = /^"([^"]+)"\s*(?:extends\s*\[|:)/;
+  const pattern = /^"([^"]+)"(?:\s+success_rate|\s+time_slice)?\s*(?:extends\s*\[|:)/;
   for (let i = 0; i < lines.length; i++) {
     if (!pattern.test(lines[i])) continue;
     const nameIdx = lines[i].indexOf(`"${itemName}"`);
@@ -37,14 +40,18 @@ export function findMeasurementItemLocation(
   return null;
 }
 
-/** Extract measurement names referenced via `Expectations measured by "name"` headers. */
+/** Extract measurement names referenced via an expectation's
+ *  `as measured by "name"` clause. */
 export function extractReferencedMeasurementNames(text: string): string[] {
   const names: string[] = [];
-  const pattern = /Expectations\s+measured\s+by\s+"([^"]+)"/;
+  const pattern = /as\s+measured\s+by\s+"([^"]+)"/g;
   for (const line of text.split("\n")) {
     if (line.trimStart().startsWith("#")) continue;
-    const match = pattern.exec(line);
-    if (match) names.push(match[1]);
+    let match: RegExpExecArray | null;
+    pattern.lastIndex = 0;
+    while ((match = pattern.exec(line)) !== null) {
+      names.push(match[1]);
+    }
   }
   return names;
 }
@@ -59,13 +66,15 @@ export function extractPathPrefix(filePath: string): [string, string, string] {
   return [org, team, service];
 }
 
-/** Extract expectation identifiers (org.team.service.name) from an expects file. */
+/** Extract expectation identifiers (org.team.service.name) from an expects file.
+ *  Under the envelope grammar, expects files are identified by the presence
+ *  of `Guarantees`, and each expectation is a top-level `"name":` line. */
 export function extractExpectationIdentifiers(
   text: string,
   uri: string,
 ): Map<string, string> {
   const result = new Map<string, string>();
-  if (!text.includes("Expectations measured by")) return result;
+  if (!text.includes("Guarantees")) return result;
 
   let filePath: string;
   try {
@@ -75,7 +84,9 @@ export function extractExpectationIdentifiers(
   }
   const [org, team, service] = extractPathPrefix(filePath);
 
-  const pattern = /\*\s+"([^"]+)"/;
+  // Top-level item header: zero leading whitespace, "<name>": optionally with
+  // an `extends [...]` clause and nothing else significant on the line.
+  const pattern = /^"([^"]+)"(?:\s+extends\s+\[[^\]]*\])?\s*:\s*$/;
   for (const line of text.split("\n")) {
     if (line.trimStart().startsWith("#")) continue;
     const match = pattern.exec(line);

@@ -164,16 +164,17 @@ describe("extractVendors", () => {
   });
 
   test("returns empty map for expects files", () => {
-    const text = `Expectations measured by "slo-measurement"
-  * "p99-latency":
-    Provides { env: "production" }`;
+    const text = `"p99-latency":
+  Guarantees 99.9% over 30d window as measured by "slo-measurement" with: {
+    env: "production"
+  }`;
     const vendors = extractVendors(text, "file:///workspace/org/team/service.caffeine");
     expect(vendors.size).toBe(0);
   });
 
   test("returns empty map when no URI provided", () => {
     const text = `"item":
-  Provides { threshold: 99.9% }`;
+  Provides { vendor: "datadog" }`;
     const vendors = extractVendors(text);
     expect(vendors.size).toBe(0);
   });
@@ -201,21 +202,24 @@ describe("extractVendors", () => {
 
 describe("extractExpectationPositions", () => {
   test("finds expectation items with correct line numbers", () => {
-    const text = `Expectations measured by "my-measurement"
-  * "first-item":
-    Provides { env: "prod" }
-  * "second-item":
-    Provides { env: "staging" }`;
+    const text = `"first-item":
+  Guarantees 99.9% over 30d window as measured by "my-measurement" with: {
+    env: "prod"
+  }
+"second-item":
+  Guarantees 99.5% over 30d window as measured by "my-measurement" with: {
+    env: "staging"
+  }`;
     const positions = extractExpectationPositions(text);
     expect(positions.length).toBe(2);
-    expect(positions[0]).toEqual({ name: "first-item", line: 1 });
-    expect(positions[1]).toEqual({ name: "second-item", line: 3 });
+    expect(positions[0]).toEqual({ name: "first-item", line: 0 });
+    expect(positions[1]).toEqual({ name: "second-item", line: 4 });
   });
 
   test("returns empty for measurement files", () => {
     const text = `"item":
   Requires { env: String }
-  Provides { threshold: 99.9% }`;
+  Provides { vendor: "datadog" }`;
     const positions = extractExpectationPositions(text);
     expect(positions.length).toBe(0);
   });
@@ -225,11 +229,12 @@ describe("extractExpectationPositions", () => {
   });
 
   test("skips commented items", () => {
-    const text = `Expectations measured by "bp"
-  * "active":
-    Provides { env: "prod" }
-  # * "commented":
-  #   Provides { env: "dev" }`;
+    const text = `"active":
+  Guarantees 99.9% over 30d window as measured by "bp" with: {
+    env: "prod"
+  }
+# "commented":
+#   Guarantees 99.5% over 30d window as measured by "bp" with: {}`;
     const positions = extractExpectationPositions(text);
     expect(positions.length).toBe(1);
     expect(positions[0].name).toBe("active");

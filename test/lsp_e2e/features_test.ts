@@ -158,9 +158,10 @@ test("completion suggests measurement names from workspace", async () => {
     client.openDocument(exUri, exText);
     await exDiagPromise;
 
-    // Line 0: 'Expectations measured by "test_measurement"'
-    // Character 26 is right after the opening quote — triggers measurement name completions
-    const items = await client.completion(exUri, 0, 26);
+    // Fixture line 1: '  Guarantees 99.9% over 30d window as measured by "test_measurement" with: {'
+    // Column 51 sits one past the opening quote of "test_measurement" — that's
+    // the `as measured by "..."` completion context.
+    const items = await client.completion(exUri, 1, 51);
 
     expect(Array.isArray(items)).toBeTruthy();
     expect(items.length > 0).toBeTruthy();
@@ -187,9 +188,9 @@ test("go-to-definition on extendable navigates to definition", async () => {
     client.openDocument(uri, text);
     await diagPromise;
 
-    // Line 3: '  * "checkout" extends [_defaults]:'
-    // "_defaults" starts at character 24
-    const result = await client.definition(uri, 3, 24);
+    // Fixture line 2: '"checkout" extends [_defaults]:'
+    // "_defaults" starts at column 20.
+    const result = await client.definition(uri, 2, 21);
 
     expect(result !== null).toBeTruthy();
     expect(result[0].uri).toBe(uri);
@@ -222,9 +223,9 @@ test("signature help returns measurement parameters in expects Provides", async 
     client.openDocument(exUri, exText);
     await exDiagPromise;
 
-    // Line 3: '      env: "production",'
-    // Cursor on "env" field line
-    const result = await client.signatureHelp(exUri, 3, 10);
+    // Fixture line 2: '    env: "production",' inside the `with: {...}` block.
+    // Cursor on the env field.
+    const result = await client.signatureHelp(exUri, 2, 6);
 
     expect(result !== null).toBeTruthy();
     expect(result.signatures.length).toBeGreaterThan(0);
@@ -287,9 +288,8 @@ test("type hierarchy prepare on expectation item returns items", async () => {
     client.openDocument(exUri, exText);
     await exDiagPromise;
 
-    // Line 1: '  * "test_expectation":'
-    // Cursor on "test_expectation" (inside the item name)
-    const result = await client.prepareTypeHierarchy(exUri, 1, 8);
+    // Fixture line 0: '"test_expectation":' — cursor inside the item name.
+    const result = await client.prepareTypeHierarchy(exUri, 0, 5);
 
     expect(result !== null).toBeTruthy();
     expect(Array.isArray(result)).toBeTruthy();
